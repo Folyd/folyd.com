@@ -4,14 +4,28 @@
 <link rel="stylesheet" href="{{ '/static/styles.css'|asseturl }}">
 <title>Welcome — Folyd</title>
 
-<body>
-    <header>
-        <h1>Folyd</h1>
+<body class="has-background-primary has-text-white has-text-centered">
+    <header class="section has-text-centered">
+        <h1 class="heading has-text-white">Folyd</h1>
+        <p class="subtitle has-text-white">A virtuous idealist and minimalist</p>
     </header>
-    <div>
-        
+    <div class="container">
+        <div class="section">
+            <div class="columns">
+                {% for id,item in bag("menu").items()%}
+                <a class="column tile-card" href="{{ item.path }}">
+                    <div class="title">
+                        {{ item.label }}
+                    </div>
+                    <p class="text">{{ item.description }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
     </div>
     <footer>
         &copy; Copyright 2018 by Folyd.
     </footer>
+    </div>
+
 </body>

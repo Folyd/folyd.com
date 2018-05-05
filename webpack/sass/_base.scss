@@ -1,7 +1,7 @@
 @import "~bulma/sass/utilities/initial-variables.sass";
 @import url('https://fonts.googleapis.com/css?family=Poppins|Open+Sans');
 
-$primary-blue: #507CE8;
+$primary-blue: #1c45a5;
 
 $primary: $primary-blue;
 $light: #C9D6F5;
@@ -16,3 +16,55 @@ $table-cell-border: 1px solid #EAEFF2;
 @import "~bulma/sass/elements/container.sass";
 @import "~bulma/sass/elements/content.sass";
 @import "~bulma/sass/layout/_all.sass";
+
+.heading {
+    font-size: 38px;
+    line-height: 60px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #234689;
+    letter-spacing: 1px;
+  }
+  
+  .title {
+    font-size: 28px;
+    line-height: 42px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #546496;
+    letter-spacing: 0;
+  }
+  
+  .subtitle {
+    font-size: 22px;
+    line-height: 30px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    color: #44485B;
+    letter-spacing: 0;
+  }
+  
+  .text {
+    font-size: 17px;
+    line-height: 26px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: normal;
+    color: #6D7D93;
+    letter-spacing: 0;
+  }
+  
+  .subtext {
+    font-size: 15px;
+    line-height: 26px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: normal;
+    color: #6D7D93;
+    letter-spacing: 0;
+  }
+  
+  .pipe-title {
+    border-left: 5px solid #1882ef;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    display: flex;
+  }
