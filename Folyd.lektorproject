@@ -1,3 +1,6 @@
 [project]
 name = Folyd
 url = https://folyd.com
+
+[packages]
+lektor-webpack-support = 0.4

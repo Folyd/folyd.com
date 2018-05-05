@@ -1,2 +1,6 @@
 .DS_Store
-
+webpack/node_modules
+assets/static/
+packages/*/*.egg-info
+*.py[co]
+__pycache__
