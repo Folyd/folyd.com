@@ -1,14 +1,22 @@
 <div class="tabs-container">
     <div class="tabs">
         <div class="tabs-menu">
-            <div>{{ menu.label }}</div>
+            <span>
+                <!-- <img src="menu.thumb" alt=""> -->
+            </span>
+            <span class="subtitle">{{ menu.label }}</span>
         </div>
-        <ul>
+        <div class="tabs-list">
             {% for tab in site.get(menu.path).children %}
-            <li>
-                <a href="{{ tab|url }}">{{ tab.title }}</a>
-            </li>
+                {% if this.path == tab.path %} 
+                    {% set item_class="tabs-list-item active" %}
+                {% else %}
+                    {% set item_class="tabs-list-item" %}
+                {% endif %}
+                <a class="{{ item_class }}" href="{{ tab|url }}">
+                    {{ tab.title }}
+                </a>
             {% endfor %}
-        </ul>
+        </div>
     </div>
 </div>
