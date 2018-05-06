@@ -26,3 +26,65 @@ body, html {
     background-size: contain;
     background-position: bottom;
 }
+
+.page{
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 100%;
+    width: 100%;
+}
+
+.navigator{
+    width: inherit;
+    height: 100vh;
+    transition: height 0.25s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    left: 0;
+    z-index: 300;
+
+    .menu{
+        align-items: center;
+        color: #DEEBFF;
+        background-color: #0747A6;
+        box-sizing: border-box;
+        flex-direction: column;
+        padding: 16px 0 16px;
+        width: 64px;
+    }
+
+    .tabs-container{
+        flex-grow: 1;
+        flex-shrink: 1;
+        min-width: 64px;
+        display: flex;
+    }
+
+    .tabs-menu{
+        align-items: center;
+        border-radius: 3px;
+        box-sizing: border-box;
+        display: flex;
+        flex: none;
+        background-color: transparent;
+        color: #42526E;
+        text-decoration: none;
+        padding: 8px 4px 8px 4px;
+    }
+
+    .tabs{
+        display: flex;
+        background-color: #F4F5F7;
+        color: #42526E;
+        flex-direction: column;
+        padding-top: 16px;
+        width: 100%;
+    }
+}
+
+.body{
+    flex: 1 1 auto;
+    position: relative;
+    z-index: 1;
+}

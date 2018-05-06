@@ -2,28 +2,35 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="{{ '/static/styles.css'|asseturl }}">
 <title>{% block title %}Welcome{% endblock %} — Folyd</title>
+
 <body>
-  <header>
-    <h1>Folyd</h1>
-    <nav>
-      <ul class="nav navbar-nav">
-        <li{% if this._path == '/' %} class="active"{% endif
-          %}><a href="{{ '/'|url }}">Welcome</a></li>
-        {% for href, title in [
-          ['/blog', 'Blog'],
-          ['/projects', 'Projects'],
-          ['/about', 'About']
-        ] %}
-          <li{% if this.is_child_of(href) %} class="active"{% endif
-            %}><a href="{{ href|url }}">{{ title }}</a></li>
-        {% endfor %}
-      </ul>
-    </nav>
-  </header>
   <div class="page">
-    {% block body %}{% endblock %}
+    <div style="width:320px;">
+      <div class="navigator">
+        <div class="menu">
+          <a href="/">
+            <h1 class="title">Folyd</h1>
+          </a>
+          <nav>
+            <ul class="nav navbar-nav">
+              {% for id,item in bag("menu").items()%}
+              <li{% if this.is_child_of(item.path) %} class="active" {% endif %}>
+                <a href="{{ item.path|url }}">{{ item.label }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+          </nav>
+        </div>
+        {% block tabs %}{% endblock %}
+      </div>
+    </div>
+
+    <div class="body">
+      {% if this.children %}
+        {{ this.children.first().body }}
+      {% else %}
+        {{ this.body }}
+      {% endif %}
+    </div>
   </div>
-  <footer>
-    &copy; Copyright 2018 by Folyd.
-  </footer>
 </body>

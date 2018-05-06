@@ -1,0 +1,14 @@
+<div class="tabs-container">
+    <div class="tabs">
+        <div class="tabs-menu">
+            <div>{{ menu.label }}</div>
+        </div>
+        <ul>
+            {% for tab in site.get(menu.path).children %}
+            <li>
+                <a href="{{ tab|url }}">{{ tab.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
