@@ -15,9 +15,12 @@
                 {% for id,item in bag("menu").items()%}
                 <a class="column tile-card" href="{{ item.path }}">
                     <div class="title">
-                        {{ item.label }}
+                        <span>
+                            <img src="{{ item.thumb|asseturl }}" alt="" style="vertical-align: middle;margin-right:8px">
+                        </span>
+                        <span>{{ item.label }}</span>
                     </div>
-                    <p class="text">{{ item.description }}</p>
+                    <p class="subtext">{{ item.description }}</p>
                 </a>
                 {% endfor %}
             </div>

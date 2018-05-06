@@ -11,14 +11,13 @@
           <a href="/">
             <h1 class="title">Folyd</h1>
           </a>
-          <nav>
-            <ul class="nav navbar-nav">
+          <nav class="nav">
               {% for id,item in bag("menu").items()%}
-              <li{% if this.is_child_of(item.path) %} class="active" {% endif %}>
-                <a href="{{ item.path|url }}">{{ item.label }}</a>
-                </li>
-                {% endfor %}
-            </ul>
+              <a {% if this.is_child_of(item.path) %} class="active" {% endif %}
+                 href="{{ item.path|url }}" title="{{ item.label + ' - ' + item.description }}">
+                <img class="nav-image-item" src="{{ item.icon|asseturl }}" alt="">
+              </a>
+              {% endfor %}
           </nav>
         </div>
         {% block tabs %}{% endblock %}

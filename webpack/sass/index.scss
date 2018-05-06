@@ -22,7 +22,6 @@ body, html {
     transition: all 0.3s cubic-bezier(0.15, 1, 0.33, 1);
     animation-delay: 0.5s;
     background-image: none;
-    padding-bottom: 20;
     background-size: contain;
     background-position: bottom;
 }
@@ -51,6 +50,16 @@ body, html {
         flex-direction: column;
         padding: 16px 0 16px;
         width: 64px;
+    }
+
+    .nav{
+        margin-top: 40px; 
+        text-align: center;
+    }
+
+    .nav-image-item{
+        margin: 12px 0;
+        cursor: pointer;
     }
 
     .tabs-container{
