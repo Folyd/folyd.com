@@ -6,4 +6,11 @@ author: Folyd
 ---
 body:
 
-### This is an example blog post.  Not much here but that's not the point :)
+# Hello Website
+
+This is an example blog post.  Not much here but that's not the point :)
+
+```python
+def get():
+    print 'hello'
+```

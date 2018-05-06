@@ -7,7 +7,7 @@
   <div class="page">
     <div style="width:320px;">
       <div class="navigator">
-        <div class="menu">
+        <div class="menu has-background-primary">
           <a href="/">
             <h1 class="title">Folyd</h1>
           </a>
@@ -23,14 +23,16 @@
         </div>
         {% block tabs %}{% endblock %}
       </div>
-    </div>
+    </div> 
 
-    <div class="body">
-      {% if this.children %}
-        {{ this.children.first().body }}
-      {% else %}
-        {{ this.body }}
-      {% endif %}
-    </div>
+    <div class="section content">
+      <div class="body">
+        {% if this.children %}
+          {{ this.children.first().body }}
+        {% else %}
+          {{ this.body }}
+        {% endif %}
+      </div>
+  </div>
   </div>
 </body>

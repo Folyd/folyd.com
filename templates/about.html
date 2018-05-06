@@ -1,0 +1,9 @@
+{% extends "layout/base.html" %}
+{% block title %}{{ this.title }}{% endblock %}
+
+{% block tabs %}
+  {% set menu_about=bag("menu.about") %}
+  {% with menu=menu_about %}
+    {% include "partials/tabs.html" %}
+  {% endwith %}
+{% endblock %}
