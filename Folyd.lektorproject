@@ -4,3 +4,6 @@ url = https://folyd.com
 
 [packages]
 lektor-webpack-support = 0.4
+
+[servers.ghpages]
+target = ghpages+https://github.com/Folyd/folyd.github.io.git
