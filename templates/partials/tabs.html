@@ -9,7 +9,9 @@
         </div>
         <div class="tabs-list">
             {% for tab in site.get(menu.path).children %}
-                {% if this.path == tab.path %} 
+                {% if loop.first and this.children %}
+                    {% set item_class="tabs-list-item active" %}
+                {% elif this.path == tab.path %} 
                     {% set item_class="tabs-list-item active" %}
                 {% else %}
                     {% set item_class="tabs-list-item" %}
