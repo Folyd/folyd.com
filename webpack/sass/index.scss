@@ -44,17 +44,20 @@ body, html {
     z-index: 300;
 
     .menu{
+        text-align: center;
         align-items: center;
         color: #DEEBFF;
         box-sizing: border-box;
         flex-direction: column;
-        padding: 16px 0 16px;
-        width: 64px;
+        padding: 16px 0;
+        width: 70px;
     }
 
     .nav{
         margin-top: 40px; 
         text-align: center;
+        display: flex;
+        flex-direction: column;
     }
 
     .nav-image-item{
