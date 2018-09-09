@@ -6,54 +6,55 @@
 <title>{% block title %}Welcome{% endblock %} — Folyd</title>
 
 <body>
-  <div class="page">
+<div class="page">
     <div style="width:320px;min-width: 320px;">
-      <div class="navigator">
-        <div class="menu has-background-primary">
-          <a href="/">
-            <img src="/img/logo-white.svg" alt="folyd" style="margin:15px 0;height:12px;">
-          </a>
-          <nav class="nav">
-              {% for id,item in bag("menu").items()%}
-              <a {% if this.is_child_of(item.path) %} class="active" {% endif %}
-                 href="{{ item.path|url }}" title="{{ item.label + ' - ' + item.description }}">
-                <img class="nav-image-item" src="{{ item.icon|asseturl }}" alt="">
-              </a>
-              {% endfor %}
-          </nav>
+        <div class="navigator">
+            <div class="menu has-background-primary">
+                <a href="/">
+                    <img src="/img/logo-white.svg" alt="folyd" style="margin:15px 0;height:12px;">
+                </a>
+                <nav class="nav">
+                    {% for id,item in bag("menu").items() %}
+                    <a {% if this.is_child_of(item.path) %} class="active" {% endif %}
+                       href="{{ item.path|url }}" title="{{ item.label + ' - ' + item.description }}">
+                        <img class="nav-image-item" src="{{ item.icon|asseturl }}" alt="">
+                    </a>
+                    {% endfor %}
+                </nav>
+            </div>
+            {% block tabs %}{% endblock %}
         </div>
-        {% block tabs %}{% endblock %}
-      </div>
-    </div> 
+    </div>
 
     <div class="body-container content">
-      <div class="body text">
-        
-        {% if this.children %}
-          <h1>{{ this.children.first().title }}</h1>
-          {{ this.children.first().body }}
-        {% else %}
-          <h1>{{ this.title }}</h1>
-          {{ this.body }}
-        {% endif %}
-      </div>
+        <div class="body text">
+            {% if this.children %}
+            <h1>{{ this.children.first().title }}</h1>
+            <br>
+            {{ this.children.first().body }}
+            {% else %}
+            <h1>{{ this.title }}</h1>
+            <br>
+            {{ this.body }}
+            {% endif %}
+        </div>
     </div>
     {# Always show table of content for parent page or self page. #}
     {% set body = this.children.first().body if this.children else this.body %}
     {% if body.toc %}
     <div class="table-of-content">
-      <b class="pipe-title">Table of content</b>
-      <ul class="toc">
-        {% for item in body.toc recursive %}
-        <li>
-          <a href="#{{ item.anchor }}">{{ item.title | trim }}</a>
-          {% if item.children %}
-          <ul>{{ loop(item.children) }}</ul>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
+        <b class="pipe-title">Table of content</b>
+        <ul class="toc">
+            {% for item in body.toc recursive %}
+            <li>
+                <a href="#{{ item.anchor }}">{{ item.title | trim }}</a>
+                {% if item.children %}
+                <ul>{{ loop(item.children) }}</ul>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
     </div>
     {% endif %}
-  </div>
+</div>
 </body>
