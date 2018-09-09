@@ -18,53 +18,53 @@ $table-cell-border: 1px solid #EAEFF2;
 @import "~bulma/sass/layout/_all.sass";
 
 .heading {
-    font-size: 38px;
-    line-height: 60px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    color: #234689;
-    letter-spacing: 1px;
-  }
-  
-  .title {
-    font-size: 28px;
-    line-height: 42px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    color: #546496;
-    letter-spacing: 0;
-  }
-  
-  .subtitle {
-    font-size: 22px;
-    line-height: 30px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    color: #44485B;
-    letter-spacing: 0;
-  }
-  
-  .text {
-    font-size: 17px;
-    line-height: 26px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: normal;
-    color: #6D7D93;
-    letter-spacing: 0;
-  }
-  
-  .subtext {
-    font-size: 15px;
-    line-height: 26px;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: normal;
-    color: #6D7D93;
-    letter-spacing: 0;
-  }
-  
-  .pipe-title {
-    border-left: 5px solid #1882ef;
-    padding: 0 10px;
-    margin-bottom: 15px;
-    display: flex;
-  }
+  font-size: 38px;
+  line-height: 60px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #234689;
+  letter-spacing: 1px;
+}
+
+.title {
+  font-size: 28px;
+  line-height: 42px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  color: #546496;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  font-size: 22px;
+  line-height: 30px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  color: #44485B;
+  letter-spacing: 0;
+}
+
+.text {
+  font-size: 16px;
+  line-height: 26px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: normal;
+  color: #505b6f;
+  letter-spacing: 0;
+}
+
+.subtext {
+  font-size: 15px;
+  line-height: 26px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: normal;
+  color: #6D7D93;
+  letter-spacing: 0;
+}
+
+.pipe-title {
+  border-left: 5px solid #1882ef;
+  padding: 0 10px;
+  margin-bottom: 15px;
+  display: flex;
+}
