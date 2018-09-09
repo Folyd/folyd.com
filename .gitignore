@@ -1,4 +1,5 @@
 .DS_Store
+.idea
 webpack/node_modules
 assets/static/
 packages/*/*.egg-info
