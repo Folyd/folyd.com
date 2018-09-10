@@ -29,11 +29,11 @@
     <div class="body-container content">
         <div class="body text">
             {% if this.children %}
-            <h1>{{ this.children.first().title }}</h1>
+            <div class="heading">{{ this.children.first().title }}</div>
             <br>
             {{ this.children.first().body }}
             {% else %}
-            <h1>{{ this.title }}</h1>
+            <div class="heading">{{ this.title }}</div>
             <br>
             {{ this.body }}
             {% endif %}
