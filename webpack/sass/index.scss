@@ -101,9 +101,13 @@ body, html {
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
-    overflow: scroll;
+    overflow: auto;
     position: relative;
     margin-top: 25px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .tabs-list-item {
