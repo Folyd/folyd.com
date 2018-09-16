@@ -123,6 +123,15 @@ body, html {
       background-color: rgba(9, 30, 66, 0.04);
     }
   }
+
+  & #close-menu-button {
+    display: none;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    padding: 5px;
+    cursor: pointer;
+  }
 }
 
 .header-navigator {
@@ -190,6 +199,10 @@ body, html {
 
   .navigator-container {
     display: none;
+
+    & #close-menu-button {
+      display: block;
+    }
   }
 
   .header-navigator {
