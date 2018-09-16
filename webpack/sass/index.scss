@@ -124,6 +124,24 @@ body, html {
   }
 }
 
+.header-navigator {
+  position: fixed;
+  top: 0;
+  padding: 10px;
+  height: auto;
+  background-color: #1c45a5;
+  color: #FFFFFF;
+  width: 100%;
+  display: none;
+  z-index: 99999999;
+
+  & > svg {
+    position: absolute;
+    left: 10px;
+  }
+
+}
+
 .body-container {
   flex: 1 1 auto;
   padding: 3rem;
@@ -165,11 +183,18 @@ body, html {
 
 @media screen and (max-width: 768px) {
   .body-container {
-    padding: 2rem;
+    padding: 5rem 2rem 2rem;
   }
 
   .navigator-container {
     display: none;
+  }
+
+  .header-navigator {
+    display: flex;
+    flex-direction: row;
+    justify-items: center;
+    justify-content: center;
   }
 }
 
