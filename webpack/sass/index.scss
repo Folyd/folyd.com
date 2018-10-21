@@ -55,6 +55,7 @@ body, html {
     flex-direction: column;
     padding: 16px 0;
     width: 70px;
+    min-width: 70px;
   }
 
   .nav {
@@ -120,7 +121,6 @@ body, html {
     color: #42526E;
     padding: 8px;
     text-decoration: none;
-    height: 36px;
     font-size: 14px;
 
     &:hover, &.active {
