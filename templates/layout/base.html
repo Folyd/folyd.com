@@ -47,15 +47,12 @@
 
 
     <div class="body-container content">
+        {% from "macros/base.html" import render_content %}
         <div class="body text">
             {% if this.children %}
-            <div class="heading">{{ this.children.first().title }}</div>
-            <br>
-            {{ this.children.first().body }}
+                {{ render_content(target=this.children.first()) }}
             {% else %}
-            <div class="heading">{{ this.title }}</div>
-            <br>
-            {{ this.body }}
+                {{ render_content(target=this) }}
             {% endif %}
         </div>
     </div>

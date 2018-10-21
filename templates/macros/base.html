@@ -1,0 +1,10 @@
+{% macro render_content(target) -%}
+    <div class="heading">{{ target.title }}</div>
+    {% if target.pub_date %}
+        <div style="font-size: 14px;color: #999;">
+            -- 发布于{{ target.pub_date }}
+        </div>
+    {% endif %}
+    <br>
+    {{ target.body }}
+{%- endmacro %}
