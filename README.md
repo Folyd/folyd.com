@@ -1,6 +1,6 @@
 # Folyd.com
 
-[![Build Status](https://travis-ci.com/Folyd/folyd.github.io.svg?branch=master)](https://travis-ci.com/Folyd/folyd.github.io)
+[![Build Status](https://travis-ci.com/Folyd/folyd.com.svg?branch=master)](https://travis-ci.com/Folyd/folyd.com)
 
 Personal website, proudly powered by Lektor and Bulma.css.
 
