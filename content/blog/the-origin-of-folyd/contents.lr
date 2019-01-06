@@ -9,24 +9,24 @@ body:
 
 Folyd是我从13年大二开始一直在使用的网名，一直到陪伴我到现在，当初为什么取这个名字，没有什么特别的原因，完全是一些机缘巧合和阴差阳错。
 
-### Floyd算法
+### Floyd算法 (#folyd-algorithm)
 
 学过CS的人应该都知道Floyd是什么，在图论中有一个很著名的求任意两点间最短路径的算法，它的时间复杂度是O(n<sup>3</sup>)，它的优点是很容易理解和实现，它就叫Floyd算法。
 这个算法名称是以创始人之一、1978年图灵奖获得者、斯坦福大学计算机科学系教授Robert W. Floyd命名的。
 
 
-### 阴差阳错
+### 阴差阳错 (#a-mistaken)
 
 大二数据结构课程第一次学到Floyd算法，觉得很有意思，然后不知道哪来的念头想以这个名字注册一个.com域名，但是当时在输入的时候阴差阳错的把floyd打成了folyd。
 注册成功之后才发现自己把域名打错了，其实floyd.com这个域名早在1997年就被注册了。
 
-### 将错就错
+### 将错就错 (#never-mind-the-mistaken)
 
 2013年1月12号第一次注册了folyd.com之后我的很多网站用户名都是Folyd，比如[Github](https://github.com/Folyd)、
 [Stackoverflow](https://stackoverflow.com/users/2220110/folyd)、[Gitlab](https://gitlab.com/Folyd)等等。后面因为没有续费域名被收回，
 断断续续几年时间里重新注册了两次，总感觉舍不得丢掉这个域名。
 
-### 未来的Folyd
+### 未来的Folyd (#the-future-of-folyd)
 
 现在的folyd.com是我基于Python优秀的开源CMS软件[Lektor](https://github.com/lektor/lektor)编写的，整体定位是个人网站，整个网站的UI偏向于极简主义，非常简洁直观。
 之后会不定期在这里更新自己的博文，介绍自己的项目等等。

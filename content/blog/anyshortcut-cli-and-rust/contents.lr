@@ -11,14 +11,14 @@ body:
 
 大半年前接触到Rust，被这门语言深深折服，于是从官方文档开始学习Rust，入门之后写了一个**Anyshortcut CLI**版。
 
-### **项目地址**
+### 项目地址 (#github-repository)
 https://github.com/anyshortcut/anyshortcut-cli 
 
 自认为这个项目很适合Rust初学者学习。
 
 ![](https://github.com/anyshortcut/anyshortcut-cli/raw/master/anyshortcut-cli.jpg)
 
-### **命令行的Anyshortcut可以干什么？**
+### 命令行的Anyshortcut可以干什么？ (#how-anyshortcut-cli-works)
 
 因为Anyshortcut的快捷键是可以同步的，对于CLI程序是通过Access token来访问后端API来同步快捷键的。Access token可以在官网用户中心找到。
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fwf33zungwj31kw0q6793.jpg)
@@ -37,7 +37,7 @@ Url: https://www.google.com/
 alias as=$(which anyshortcut)
 ```
 
-### **怎么安装**
+### 怎么安装 (#how-to-install)
 
 - 如果你是Rust 开发者，很简单，用*cargo install*就行。
 
@@ -52,7 +52,7 @@ cargo install anyshortcut
 brew install anyshortcut
 ```
 
-### **使用Rust半年之后的感想**
+### 使用Rust半年之后的感想 (#what-i-thought-after-half-year-rust-programming)
 > 申明：除了Rust 之外我个人熟悉的编程语言只有C++ 2003, Java, Python, Javascript, Groovy，我并没有研究过各种编程语言，
 甚至Ruby、Go、Swift、Kotlin、Scala，Haskell等我都一律没有去学过，所以这些只能算比较浅显的感想。
 
