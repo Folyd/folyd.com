@@ -60,17 +60,19 @@
     {% set body = this.children.first().body if this.children else this.body %}
     {% if body.toc %}
     <div class="table-of-content">
-        <b class="pipe-title">Table of content</b>
-        <ul class="toc">
-            {% for item in body.toc recursive %}
-            <li>
-                <a href="#{{ item.anchor }}">{{ item.title | trim }}</a>
-                {% if item.children %}
-                <ul>{{ loop(item.children) }}</ul>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
+        <div class="sticky">
+            <b class="pipe-title">Table of content</b>
+            <ul class="toc">
+                {% for item in body.toc recursive %}
+                <li>
+                    <a href="#{{ item.anchor }}">{{ item.title | trim }}</a>
+                    {% if item.children %}
+                    <ul>{{ loop(item.children) }}</ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
     {% endif %}
 </div>
