@@ -112,11 +112,11 @@ Mapping the *search word* and *search index* to generate the *search result*, bu
 var suggestResults = [
     {
       content: "https://doc.rust-lang.org/std/ops/trait.Deref.html",
-      description: "std::ops::<match>Deref</match> - <dim>Used for immutable dereferencing operations, like `*v`.</dim>"
+      description: "std::ops::Deref - Used for immutable dereferencing operations."
     },
     {
       content: "https://doc.rust-lang.org/std/ops/trait.Deref.html#tymethod.deref",
-      description: "std::ops::Deref::<match>deref</match> - <dim>Dereferences the value.</dim>"
+      description: "std::ops::Deref::deref - Dereferences the value."
     },
     ...
 ];
