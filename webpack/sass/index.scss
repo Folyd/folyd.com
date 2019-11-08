@@ -158,7 +158,7 @@ body, html {
 }
 
 .body-container {
-  flex: 1 1 auto;
+  flex-grow: 1;
   padding: 3rem;
 }
 
@@ -169,6 +169,7 @@ body, html {
 
 .table-of-content {
   min-width: 240px;
+  max-width: 260px;
   padding: 3rem 0;
   font-size: 14px;
 
@@ -180,7 +181,7 @@ body, html {
       & > ul {
 
         & > li {
-          font-size: 14px;
+          font-size: 13px;
           padding-left: 10px
         }
       }
