@@ -53,7 +53,7 @@ The final *search index* is an object array like this:
 var searchIndex = [
     {
       crate: "std",
-      desc: "A hash map implemented with linear probing and Robin Hood bucket stealing.",
+      desc: "A hash map implemented with linear probing ...",
       name: "HashMap",
       parent: undefined,
       path: "std::collections",
@@ -62,7 +62,7 @@ var searchIndex = [
     },
     {
       crate: "std",
-      desc: "Applies function to the elements of iterator and returns the first non-none result.",
+      desc: "Applies function to the elements of iterator ...",
       name: "find_map",
       parent: {ty: 8, name: "Iterator"},
       path: "std::iter",
