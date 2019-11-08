@@ -3,24 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Folyd",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
+    "babel-loader": "^7.1.5",
     "css-loader": "^0.28.11",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
-    "node-sass": "^4.10.0",
-    "sass-loader": "^7.0.1",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^7.3.1",
     "style-loader": "^0.21.0",
-    "url-loader": "^1.0.1",
-    "webpack": "^3.8.1"
+    "url-loader": "^1.1.2",
+    "webpack": "^3.12.0"
   },
   "dependencies": {
-    "bulma": "^0.7.1"
+    "bulma": "^0.7.5"
   }
 }
