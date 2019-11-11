@@ -1,0 +1,13 @@
+.DS_Store
+.idea
+.git
+venv
+migrations
+
+__pycache__/
+*.py[cod]
+*$py.class
+.cache
+.dockerignore
+node_modules
+*.sketch
