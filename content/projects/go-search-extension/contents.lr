@@ -1,0 +1,32 @@
+---
+title: Go Search Extension
+---
+release_date: 2020-04-07
+---
+body:
+
+
+![](https://github.com/huhu/rust-search-extension/raw/master/assets/rustacean.gif)
+
+The ultimate search extension for Golang!
+
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/epanejkfcekejmmfbcpbcbigfpefbnlb.svg)
+![Mozilla Add-on](https://img.shields.io/amo/v/go-search-extension?color=%2320123A)
+[![license-mit](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/huhu/go-search-extension/blob/master/LICENSE)
+
+
+**Go Search Extension** is a handy browser plugin to help Golang developers search docs and packages in the address bar instantly.
+
+
+### Github
+
+https://github.com/huhu/go-search-extension
+
+### Installation
+
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/golang-search/epanejkfcekejmmfbcpbcbigfpefbnlb)
+
+- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/go-search-extension/)
+
+- [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/ebibclchdmagkhopidkjckjkbhghfehh)
+
