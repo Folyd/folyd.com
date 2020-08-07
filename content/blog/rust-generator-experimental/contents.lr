@@ -1,4 +1,4 @@
-title: Rust Generator
+title: Rust未来Generator语法探索之Propane
 ---
 pub_date: 2020-08-07
 ---
@@ -6,7 +6,7 @@ author: Folyd
 ---
 body:
 
-# Rust未来Generator语法探索之Propane
+# 现状
 
 众所周知，Rust的Generator一直没有稳定，主要原因是Generator仍然有许多设计上的问题没有明确，所以无船同志写了一个名字叫**Propane**的新crate，旨在nightly上实验性的探索Rust Generator未来语法的可能性。
 
@@ -39,6 +39,7 @@ fn main() {
 
 编译器会报[E0627 A yield expression was used outside of the generator literal.](https://doc.rust-lang.org/nightly/error-index.html#E0627)这个错。也就是目前的generator不支持以函数的方式写。
 
+# Propane
 
 前面说了，generator很多语法没有稳定甚至不支持，主要原因还是很多设计理念没有明确，所以Propane这个库先迈出了第一步。
 
@@ -79,20 +80,19 @@ fn main() {
 
 Propane提供了一个`generator`宏，可以让我们以函数的方式写Generator。当然Propane的主要目的是为了验证两个主要的设计理念是否合理：
 
-### 1) 默认返回Iterator；return关键字可以终止generator，但只支持返回`()`; generator中的`?`表达式的默认行为和普通函数有差别
+- **1) 默认返回Iterator；return关键字可以终止generator，但只支持返回`()`; generator中的`?`表达式的默认行为和普通函数有差别**
 
 用Propane的`generator`宏标记的函数是一个返回`impl Iterator`的生成器，生成器中依然可以使用`return`关键字来终止，但是不能返回其他类型的值，只支持返回`()`。
 
 生成器中支持`?`表达式，但是与普通函数中不同的是，如果生成器yield是一个`Result`类型，当`?`表达式碰到错误情况时会把错误yield出去，而不是return出去。然后在下一次resume直接退出生成器。
 
-### 2) 不支持自引用（Self-referential）
+- **2) 不支持自引用(Self-referential)**
 
 async/await语法稳定的时候为了解决自引用的问题花了很大的心思设计Pin和Unpin等概念。如果Generator默认返回迭代器Iterator的话，我们依然会碰到了自引用的问题。因为`Iterator::next`在1.0就稳定了，我们不可能再去修改它的API来让迭代器支持自引用。如果不考虑性能，目前最简单粗暴的方法是可以把Generator的每个state装箱到堆上。
 
 当然如果我们不支持自引用，就可以让generator支持零开销（zero cost），而且无船同志也大胆的推测（hypothesis）：也许我们确实不需要一个支持自引用的Generator。
 
 最后，无船同志强调，这几个理念仅仅是实验性的，而且也有可能试一次失败的尝试。
-
 
 以上是我了解完Propane之后结合无船的博客整理的文章，Propane的代码也很简洁，大家可以去Github查看。
 
