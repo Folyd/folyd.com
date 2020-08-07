@@ -1,0 +1,99 @@
+title: Rust Generator
+---
+pub_date: 2020-08-07
+---
+author: Folyd
+---
+body:
+
+# Rust未来Generator语法探索之Propane
+
+众所周知，Rust的Generator一直没有稳定，主要原因是Generator仍然有许多设计上的问题没有明确，所以无船同志写了一个名字叫**Propane**的新crate，旨在nightly上实验性的探索Rust Generator未来语法的可能性。
+
+> Propane中文翻译：丙烷，无船同志取名向来看起来比较奇怪，不知道是否有其他用意
+
+目前nightly的generator只能写成闭包的形式（官方称作generator literal），比如这样：
+```rust
+#![feature(generators, generator_trait)]
+
+fn main() {
+    let mut generator = || {
+        yield 1;
+        return "foo"
+    };
+}
+```
+如果你写成这样的话：
+```rust
+#![feature(generators, generator_trait)]
+
+fn fake_generator() -> &'static str {
+    yield 1;
+    return "foo"
+}
+
+fn main() {
+    let mut generator = fake_generator;
+}
+```
+
+编译器会报[E0627 A yield expression was used outside of the generator literal.](https://doc.rust-lang.org/nightly/error-index.html#E0627)这个错。也就是目前的generator不支持以函数的方式写。
+
+
+前面说了，generator很多语法没有稳定甚至不支持，主要原因还是很多设计理念没有明确，所以Propane这个库先迈出了第一步。
+
+```rust
+#![feature(generators, generator_trait, try_trait)]
+
+#[propane::generator]
+fn fizz_buzz() -> String {
+   for x in 1..101 {
+      match (x % 3 == 0, x % 5 == 0) {
+          (true, true)  => yield String::from("FizzBuzz"),
+          (true, false) => yield String::from("Fizz"),
+          (false, true) => yield String::from("Buzz"),
+          (..)          => yield x.to_string(),
+      }
+   }
+}
+
+fn main() {
+    let mut fizz_buzz = fizz_buzz();
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "1");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "2");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "Fizz");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "4");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "Buzz");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "Fizz");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "7");
+
+    // yada yada yada
+    let mut fizz_buzz = fizz_buzz.skip(90);
+
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "98");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "Fizz");
+    assert_eq!(&fizz_buzz.next().unwrap()[..], "Buzz");
+    assert!(fizz_buzz.next().is_none());
+}
+```
+
+Propane提供了一个`generator`宏，可以让我们以函数的方式写Generator。当然Propane的主要目的是为了验证两个主要的设计理念是否合理：
+
+### 1) 默认返回Iterator；return关键字可以终止generator，但只支持返回`()`; generator中的`?`表达式的默认行为和普通函数有差别
+
+用Propane的`generator`宏标记的函数是一个返回`impl Iterator`的生成器，生成器中依然可以使用`return`关键字来终止，但是不能返回其他类型的值，只支持返回`()`。
+
+生成器中支持`?`表达式，但是与普通函数中不同的是，如果生成器yield是一个`Result`类型，当`?`表达式碰到错误情况时会把错误yield出去，而不是return出去。然后在下一次resume直接退出生成器。
+
+### 2) 不支持自引用（Self-referential）
+
+async/await语法稳定的时候为了解决自引用的问题花了很大的心思设计Pin和Unpin等概念。如果Generator默认返回迭代器Iterator的话，我们依然会碰到了自引用的问题。因为`Iterator::next`在1.0就稳定了，我们不可能再去修改它的API来让迭代器支持自引用。如果不考虑性能，目前最简单粗暴的方法是可以把Generator的每个state装箱到堆上。
+
+当然如果我们不支持自引用，就可以让generator支持零开销（zero cost），而且无船同志也大胆的推测（hypothesis）：也许我们确实不需要一个支持自引用的Generator。
+
+最后，无船同志强调，这几个理念仅仅是实验性的，而且也有可能试一次失败的尝试。
+
+
+以上是我了解完Propane之后结合无船的博客整理的文章，Propane的代码也很简洁，大家可以去Github查看。
+
+链接：[Propane: an experimental generator syntax for Rust](https://without.boats/blog/propane/)
