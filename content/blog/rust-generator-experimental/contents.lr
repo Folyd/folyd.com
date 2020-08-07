@@ -92,7 +92,7 @@ async/await语法稳定的时候为了解决自引用的问题花了很大的心
 
 当然如果我们不支持自引用，就可以让generator支持零开销（zero cost），而且无船同志也大胆的推测（hypothesis）：也许我们确实不需要一个支持自引用的Generator。
 
-最后，无船同志强调，这几个理念仅仅是实验性的，而且也有可能试一次失败的尝试。
+最后，无船同志强调，这几个理念仅仅是实验性的，而且也有可能是一次失败的尝试。
 
 以上是我了解完Propane之后结合无船的博客整理的文章，Propane的代码也很简洁，大家可以去[Github](https://github.com/withoutboats/propane)查看。
 
