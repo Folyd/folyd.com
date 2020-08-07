@@ -94,6 +94,6 @@ async/await语法稳定的时候为了解决自引用的问题花了很大的心
 
 最后，无船同志强调，这几个理念仅仅是实验性的，而且也有可能试一次失败的尝试。
 
-以上是我了解完Propane之后结合无船的博客整理的文章，Propane的代码也很简洁，大家可以去Github查看。
+以上是我了解完Propane之后结合无船的博客整理的文章，Propane的代码也很简洁，大家可以去[Github](https://github.com/withoutboats/propane)查看。
 
 链接：[Propane: an experimental generator syntax for Rust](https://without.boats/blog/propane/)
