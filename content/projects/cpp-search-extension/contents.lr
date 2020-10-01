@@ -1,0 +1,31 @@
+---
+title: C/C++ Search Extension
+---
+release_date: 2020-09-30
+---
+body:
+
+The ultimate search extension for C/C++!
+
+![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ifpcmhciihicaljnhgobnhoehoabidhd.svg)
+![Mozilla Add-on](https://img.shields.io/amo/v/c-c-search-extension?color=%2320123A)
+[![license-apache](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/huhu/cpp-search-extension/blob/master/LICENSE)
+
+**C/C++ Search Extension** is a handy browser plugin to help C/C++ developers search docs in the address bar instantly.
+
+### Website
+
+https://cpp.extension.sh
+
+### Github
+
+https://github.com/huhu/cpp-search-extension
+
+### Installation
+
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/cc++-search-extension/ifpcmhciihicaljnhgobnhoehoabidhd)
+
+- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/c-c-search-extension/)
+
+- [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/ffajabficigcddnckikojejmkammkmpe)
+
