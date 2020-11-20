@@ -184,7 +184,7 @@ a: test1, b: I've totally changed now!
 
 更关键的是Rust的Generator和async/await这一套都是基于自引用结构体实现的。如果不能从根源上解决这个问题，Rust号称的Memory Safe的根基就完全动摇了。
 
-> 更多关于asycn/await的原理，强烈推荐阅读这两本书：
+> 更多关于async/await的原理，强烈推荐阅读这两本书：
 >
 > - https://rust-lang.github.io/async-book
 > - https://cfsamson.github.io/books-futures-explained
@@ -503,7 +503,7 @@ pub trait Future {
 }
 ```
 
-接下来讲一下**Pin**目前最重要的一个应用：**Future**。当初2018年官方异步组引入Pin API的初衷就是为了解决**Future**内部自引用的问题。因为async/await就是通过**Generator**实现的，**Generator**是通过匿名结构体实现的。如果async函数中存在跨await的引用，会导致底层**Generator**存在跨yield的引用，那根据**Generator**生成的匿名结构体就会是一个自引用结构体！然后这个自引用结构体会`impl Future`，异步的Runtime在调用`Future::poll()`函数查询状态的时候，需要一个可变借用（即`&mut Self`）。如果这个`&mut Self`不包裹在**Pin**里面的话，开发者自己`impl Future`就会利用`std::mem::swap()`之类的函数move掉``&mut Self`！所以这就是**Future**的`poll()`必须要使用`Pin<&mut Self>`的原因。
+接下来讲一下**Pin**目前最重要的一个应用：**Future**。当初2018年官方异步组引入Pin API的初衷就是为了解决**Future**内部自引用的问题。因为async/await就是通过**Generator**实现的，**Generator**是通过匿名结构体实现的。如果async函数中存在跨await的引用，会导致底层**Generator**存在跨yield的引用，那根据**Generator**生成的匿名结构体就会是一个自引用结构体！然后这个自引用结构体会`impl Future`，异步的Runtime在调用`Future::poll()`函数查询状态的时候，需要一个可变借用（即`&mut Self`）。如果这个`&mut Self`不包裹在**Pin**里面的话，开发者自己`impl Future`就会利用`std::mem::swap()`之类的函数move掉`&mut Self`！所以这就是**Future**的`poll()`必须要使用`Pin<&mut Self>`的原因。
 
 ```rust
 // 这个async块中存在跨await的借用！
