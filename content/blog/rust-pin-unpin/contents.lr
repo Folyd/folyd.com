@@ -67,7 +67,6 @@ impl<P: DerefMut<Target: Unpin>> DerefMut for Pin<P> {
 ```rust
 fn main() {
   let mut s1 = String::from("Hello");
-  s1.push_str(&"Rust");
   let s2 = s1; // s1的所有权转移给了s2，这里发生了move
   // let s3 = s1; // s1的所有权以及转移走了，不能再move，否则会报错：error[E0382]: use of moved value: `s1`
 }
@@ -210,7 +209,7 @@ pub fn swap<T>(x: &mut T, y: &mut T) {
 
 它的参数要求是可变借用**&mut**，所以只要我们想办法让Safe Rust下不暴露可变借用即可！
 
-还是以Test为例，它自身没办法限制自己不能可变借用，因为我们直接用`&mut Test{...}`就可以轻松拿到。那从标准库中去找找，`Box<T>`呢？先不考虑它性能问题，我们把我们的结构体**T**包裹在**Box**中，看**Box**能不能保证不暴露`&mut T`出去。看一下API文档，很遗憾不能。[Box::leak()](https://doc.rust-lang.org/std/boxed/struct.Box.html#method.leak)返回值就是`&mut T`，更甚者**Box** **impl**了**DerefMut**，就算不用`leak()`我们也可以通过`* &mut Box<T>`解引用轻松拿到`&mut T`！
+还是以Test为例，它自身没办法限制自己不能可变借用，因为我们直接用`&mut Test{...}`就可以轻松拿到。那从标准库中去找找，`Box<T>`呢？先不考虑它性能问题，我们把结构体**T**包裹在**Box**中，看**Box**能不能保证不暴露`&mut T`出去。看一下API文档，很遗憾不能。[Box::leak()](https://doc.rust-lang.org/std/boxed/struct.Box.html#method.leak)返回值就是`&mut T`，更甚者**Box** **impl**了**DerefMut**，就算不用`leak()`我们也可以通过`* &mut Box<T>`解引用轻松拿到`&mut T`！
 
 不用找了，在**Pin**之前的标准库中确实没有这样的API能够防止在Safe Rust下不暴露`&mut T`。
 
@@ -326,7 +325,7 @@ impl<'a, T: ?Sized> Pin<&'a mut T> {
 > - 如果`P<T>`符合**Unpin**，那`P<T>`从被**Pin**包裹到被销毁，都要一直保证`P<T>`不被钉住
 > - 如果`P<T`>符合**!Unpin**，那`P<T>`从被**Pin**包裹到被销毁，都要一直保证`P<T>`被钉住
 
-通过以上**Pin**的自述，我们再用一句话来总结：如果你实现了**Unpin**，Pin**可以让你在**Safe Rust下拿到`&mut T`，否则会把你在Safe Rust下钉住（也就是拿不到`&mut T`）。
+通过以上**Pin**的自述，我们再用一句话来总结：如果你实现了**Unpin**，**Pin**可以让你在Safe Rust下拿到`&mut T`，否则会把你在Safe Rust下钉住（也就是拿不到`&mut T`）。
 
 接下来我们使用**Pin**来修复一下上面自引用结构体的问题。
 
@@ -385,7 +384,7 @@ fn move_pinned_ref<T>(mut a: T, mut b: T) {
 
 ### Pin的应用
 
-**Pin**可以分为栈上还是堆上，取决于你要Pin的那个指针**P**是在栈上还是堆上。比如`Pin<&mut  T>`是栈上，`Pin<Box<T>>`是在堆上。
+**Pin**可以分为栈上还是堆上，取决于你要**Pin**的那个指针**P**是在栈上还是堆上。比如`Pin<&mut  T>`是栈上，`Pin<Box<T>>`是在堆上。
 
 #### Pin到栈上
 
@@ -555,7 +554,7 @@ where
 
 **Pin**除了上面这些内容外还有其他几个概念，比如Pin projection, Structural pin和Non-structural pin，笔者自己用的也不多，详细可以看官方文档或查阅其他资料。
 
-[future-rs](https://docs.rs/futures)中还有不少和**Pin**有关的API，如果深入使用futures-rs的话，不可避免的需要频繁的和**Pin**打交道。
+[futures-rs](https://docs.rs/futures)中还有不少和**Pin**有关的API，如果深入使用futures-rs的话，不可避免的需要频繁的和**Pin**打交道。
 
 ![](./features-rs.png)
 
