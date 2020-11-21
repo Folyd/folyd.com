@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="180px" height="36px" viewBox="0 0 153 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>FOLDY</title>
+    <title>FOLYD</title>
     <defs></defs>
     <g id="text" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-size="48" font-family="Poppins-Bold, Poppins" font-weight="bold">
         <text id="FOLDY" fill="#FEFEFE">
-            <tspan x="-2.932" y="35">FOLDY</tspan>
+            <tspan x="-2.932" y="35">FOLYD</tspan>
         </text>
     </g>
 </svg>
