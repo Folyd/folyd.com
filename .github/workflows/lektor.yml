@@ -21,4 +21,7 @@ jobs:
     - name: Build lektor
       run: lektor build -f webpack
     - name: Deploy to Github pages
+      env:
+        LEKTOR_DEPLOY_USERNAME: ${{ secrets.LEKTOR_DEPLOY_USERNAME }}
+        LEKTOR_DEPLOY_PASSWORD: ${{ secrets.LEKTOR_DEPLOY_PASSWORD }}
       run: lektor deploy ghpages
