@@ -326,7 +326,7 @@ let mid = (left + right) / 2;
 
 这行代码在零大小类型(Zero Sized Type，简称 ZST)下却可能会 overflow! 我们来分析一下为什么。
 
-[`slice::len()`](https://doc.rust-lang.org/std/primitive.slice.html#method.len) 的返回值是 `usize` 类型，但是对于非零大小的类型(non-ZST)，`slice::len()` 的值最大也只能是 `isize::MAX`。所以就像注释上写的那样 `(isize::MAX + isize::MAX) / 2` 是不能可能超过 `usize::MAX` 的，所以不会发生 overflow。但是对于 ZST 类型就不一样了，如果 `slice` 里面所有元素都是零大小的（比如 `()`），那这个 `slice` 的长度完全可以达到 `usize::MAX`。虽然对于 `[(); usize::MAX].binary_search(&())` 这种情况我们会在 `O(1)` 的时间复杂度上找到结果并马上返回，但是如果我们这么写 `b.binary_search_by(|_| Ordering::Less)`，它就发生整数溢出了。
+[`slice::len()`](https://doc.rust-lang.org/std/primitive.slice.html#method.len) 的返回值是 `usize` 类型，但是对于非零大小的类型(non-ZST)，`slice::len()` 的值最大也只能是 `isize::MAX`。所以就像注释上写的那样 `(isize::MAX + isize::MAX) / 2` 是不可能超过 `usize::MAX` 的，所以不会发生 overflow。但是对于 ZST 类型就不一样了，如果 `slice` 里面所有元素都是零大小的（比如 `()`），那这个 `slice` 的长度完全可以达到 `usize::MAX`。虽然对于 `[(); usize::MAX].binary_search(&())` 这种情况我们会在 `O(1)` 的时间复杂度上找到结果并马上返回，但是如果我们这么写 `b.binary_search_by(|_| Ordering::Less)`，它就发生整数溢出了。
 
 ### 为什么 `slice::len()` 对于 non-ZST 最大值是 `isize` 呢？
 
