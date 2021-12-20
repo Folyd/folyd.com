@@ -1,0 +1,560 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1c45a5">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/pygments.css">
+<title>优化 Rust 标准库的 binary_search — Folyd</title>
+
+<body>
+<div class="page">
+    <div class="header-navigator">
+        <div id="menu-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M5 15h14v2H5zm0-8h14v2H5zm0 4h14v2H5z" fill="currentColor" fill-rule="evenodd"></path>
+            </svg>
+        </div>
+        <a href="/">
+            <img src="/img/logo-white.svg" alt="folyd" style="height: 14px">
+        </a>
+    </div>
+
+    <div class="navigator-container">
+        <div class="navigator">
+            <div id="close-menu-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" role="presentation">
+                    <path d="M12 10.586L6.707 5.293a1 1 0 0 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 0 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 1 0-1.414-1.414L12 10.586z"
+                          fill="currentColor">
+                    </path>
+                </svg>
+            </div>
+            <div class="menu has-background-primary">
+                <a href="/">
+                    <img src="/img/logo-white.svg" alt="folyd" style="margin:15px 0;height:12px;">
+                </a>
+                <nav class="nav">
+                    
+                    <a  class="active" 
+                       href="/blog/" title="Blog - What I thought and wrote">
+                        <img class="nav-image-item" src="/img/icon-blog.svg?h=8a78423e" alt="">
+                    </a>
+                    
+                    <a 
+                       href="/projects/" title="Projects - What I built and created">
+                        <img class="nav-image-item" src="/img/icon-project.svg?h=033d057d" alt="">
+                    </a>
+                    
+                    <a 
+                       href="/about/" title="About - Who is me and how to contact me">
+                        <img class="nav-image-item" src="/img/icon-about.svg?h=700c2d4e" alt="">
+                    </a>
+                    
+                </nav>
+            </div>
+            
+  
+  
+    <div class="tabs-container">
+    <div class="tabs">
+        <div class="tabs-menu">
+            <span>
+                <img src="/img/b.png?h=dfedffda" alt="" 
+                     style="vertical-align: middle;margin-right:8px">
+            </span>
+            <span class="subtitle">Blog</span>
+        </div>
+        <div class="tabs-list">
+            
+                 
+                    
+                
+                <a class="tabs-list-item active" href="/blog/rust-binary-search-pr/">
+                    优化 Rust 标准库的 binary_search
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/rust-pin-unpin/">
+                    Rust 的 Pin 与 Unpin
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/rust-generator-experimental/">
+                    Rust 未来 Generator 语法探索之 Propane
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/moonlit-sailor/">
+                    Moonlit Sailor - 我的年度乐队
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/anyshortcut-cli-and-rust/">
+                    发布 Anyshortcut CLI 版以及 Rust 使用半年之后的感受
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/the-origin-of-folyd/">
+                    Folyd 的由来
+                </a>
+            
+        </div>
+    </div>
+</div>
+  
+
+        </div>
+    </div>
+
+
+    <div class="body-container content">
+        
+        <div class="body text">
+            
+                <div class="heading">优化 Rust 标准库的 binary_search</div>
+    
+        <div style="font-size: 14px;color: #999;">
+            -- 发布于2021-04-26
+        </div>
+    
+    <br>
+    <p>2021 年 5 月 6 号发布的 Rust 1.52 版将会包含我的一个 PR，将标准库 <code>slice::binary_search_by()</code> 的最好时间复杂度优化到 <code>O(1)</code>。PR 编号 <a href="https://github.com/rust-lang/rust/pull/74024">#74024</a>，从 2020 年 7 月初提交的 PR，到 2021 年 3 月 6 号才正式合并，其中包含 70 多条评论，前后历时大半年。这个 PR 虽然改动不算很大，但是笔者在其中也学到了不少知识点，所以特意写一篇文章总结一下，希望能帮助到大家。</p>
+<p>首先看一下 <a href="https://doc.rust-lang.org/std/primitive.slice.html#method.binary_search_by"><code>slice::binary_search_by()</code></a> 这个方法的示例来了解一下它的用途。</p>
+<div class="hll"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="w"> </span><span class="mi">34</span><span class="p">,</span><span class="w"> </span><span class="mi">55</span><span class="p">];</span><span class="w"></span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">seek</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span><span class="p">;</span><span class="w"></span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">probe</span><span class="o">|</span><span class="w"> </span><span class="n">probe</span><span class="p">.</span><span class="n">cmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">seek</span><span class="p">)),</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="mi">9</span><span class="p">));</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="n">seek</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w"></span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">probe</span><span class="o">|</span><span class="w"> </span><span class="n">probe</span><span class="p">.</span><span class="n">cmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">seek</span><span class="p">)),</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="mi">7</span><span class="p">));</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="n">seek</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"></span>
+<span class="fm">assert_eq!</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">probe</span><span class="o">|</span><span class="w"> </span><span class="n">probe</span><span class="p">.</span><span class="n">cmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">seek</span><span class="p">)),</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="mi">13</span><span class="p">));</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="n">seek</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">probe</span><span class="o">|</span><span class="w"> </span><span class="n">probe</span><span class="p">.</span><span class="n">cmp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">seek</span><span class="p">));</span><span class="w"></span>
+<span class="fm">assert!</span><span class="p">(</span><span class="k">match</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="mi">1</span><span class="o">..=</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+</pre></div>
+<p>这个函数的作用就是在给定的有序 slice 中二分查找目标值 <code>seek</code>。如果找到了返回 <code>Ok(pos)</code>，<code>pos</code> 即目标值所在的位置；没找到则返回 <code>Err(pos)</code>, 这里的 <code>pos</code> 的位置可以用来将 <code>seek</code> 插入 slice 后依然保持有序。其他的 <code>slice::binary_search()</code>，<code>slice::binary_search_by_key()</code> 系列方法都是调用这个 <code>slice::binary_search_by()</code>，这里不再赘叙。</p>
+<p>但是，1.52 之前的实现有一个小问题，如果 slice 中存在多个连续的目标值，则它会一直找到最后一个才返回，所以最好时间复杂度也是 <code>O(log n)</code>，而不是 <code>O(1)</code>，也就是找到了就马上返回。这是 1.52 之前的代码：</p>
+<div class="hll"><pre><span></span><span class="cp">#[stable(feature = </span><span class="s">&quot;rust1&quot;</span><span class="cp">, since = </span><span class="s">&quot;1.0.0&quot;</span><span class="cp">)]</span><span class="w"></span>
+<span class="cp">#[inline]</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">binary_search_by</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">f</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="kt">usize</span><span class="p">,</span><span class="w"> </span><span class="kt">usize</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">where</span><span class="w"></span>
+<span class="w">    </span><span class="n">F</span>: <span class="nb">FnMut</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Ordering</span><span class="p">,</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">len</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">usize</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">half</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">half</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// SAFETY: the call is made safe by the following inconstants:</span>
+<span class="w">        </span><span class="c1">// - `mid &gt;= 0`: by definition</span>
+<span class="w">        </span><span class="c1">// - `mid &lt; size`: `mid = size / 2 + size / 4 + size / 8 ...`</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">get_unchecked</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">        </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Greater</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">        </span><span class="n">size</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">half</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// SAFETY: base is always in [0, size) because base &lt;= mid.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">get_unchecked</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Equal</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">base</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Less</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>既然我们发现这个问题了，很简单，我们在 <code>while</code> 循环中判断 <code>cmp == Equal</code> 不就行了？如果相等就直接返回 <code>Ok</code>，否则继续二分去查找。</p>
+<div class="hll"><pre><span></span><span class="k">while</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">half</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">half</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// SAFETY:</span>
+<span class="w">    </span><span class="c1">// mid is always in [0, size), that means mid is &gt;= 0 and &lt; size.</span>
+<span class="w">    </span><span class="c1">// mid &gt;= 0: by definition</span>
+<span class="w">    </span><span class="c1">// mid &lt; size: mid = size / 2 + size / 4 + size / 8 ...</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">get_unchecked</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Equal</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">base</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Less</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="w"></span>
+<span class="w">    </span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="n">size</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">half</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<blockquote><p>为了简洁性，这里（包括后面）都会适当省略重复代码。</p>
+</blockquote>
+<p>嗯，看起来逻辑上没问题，单测也跑通过了，提交一个 PR，我们暂且叫它<strong>优化(1)</strong>。没过几天 <a href="https://github.com/dtolnay">dtolnay</a> review 了我的 PR 并回复了：<code>Would you be able to put together a benchmark assessing the worst case impact? The new implementation does potentially 50% more conditional branches in the hot loop.</code></p>
+<p>确实，Rust 标准库对性能要求非常高，我们必须要有足够多 case 对新旧版本做 benchmark 对比，尽可能避免新的版本导致性能上的 regression。这是当时我做的 benchmark 数据：</p>
+<pre><code>// 标准库的实现
+test slice::binary_search_l1           ... bench:          59 ns/iter (+/- 4)
+test slice::binary_search_l1_with_dups ... bench:          59 ns/iter (+/- 3)
+test slice::binary_search_l2           ... bench:          76 ns/iter (+/- 5)
+test slice::binary_search_l2_with_dups ... bench:          77 ns/iter (+/- 17)
+test slice::binary_search_l3           ... bench:         183 ns/iter (+/- 23)
+test slice::binary_search_l3_with_dups ... bench:         185 ns/iter (+/- 19)
+</code></pre>
+<pre><code>// 新版实现
+test slice::binary_search_l1           ... bench:          58 ns/iter (+/- 2)
+test slice::binary_search_l1_with_dups ... bench:          37 ns/iter (+/- 4)
+test slice::binary_search_l2           ... bench:          76 ns/iter (+/- 3)
+test slice::binary_search_l2_with_dups ... bench:          57 ns/iter (+/- 6)
+test slice::binary_search_l3           ... bench:         200 ns/iter (+/- 30)
+test slice::binary_search_l3_with_dups ... bench:         157 ns/iter (+/- 6)
+</code></pre>
+<p>可以看出来在 with_dups 模式（即重复元素较多）下，新的实现有很明显的提升，但是 l3 级别的普通模式性能反而要差很多。可能的原因正如 <strong>dtolnay</strong> 所说的 <code>The new implementation does potentially 50% more conditional branches in the hot loop</code>。那 <code>conditional branches</code> 具体是什么？为什么它在热循环中如此关键？这里引入这篇文章的第一个知识点：<strong>分支预测</strong>。</p>
+<h2 id="fen-zhi-yu-ce-branch-prediction">分支预测(Branch prediction)</h2><p><strong>分支预测</strong> (<code>branch prediction</code>) 是现代 CPU 为了加快指令并行化速度在碰到分支时提前预测下一个可能执行的分支的一种技术。 CPU 中一般都内置专门的分支预测器 (Branch predictor)。强烈推荐先阅读 Stackoverflow 这个高赞回答 <a href="https://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-processing-an-unsorted-array">Why is processing a sorted array faster than processing an unsorted array?</a>，里面比较清晰易懂的解释了分支预测是什么以及对性能带来的影响。关于<strong>分支预测</strong>完全可以写一篇专门的文章介绍了，我这里只把我学到的知识总结一下。</p>
+<h3 id="fen-zhi">分支</h3><p>首先我们要了解一下<a href="https://en.wikipedia.org/wiki/Branch_(computer_science"><strong>分支</strong></a>)到底是指什么？在高级语言层面，很显然分支就是 <code>if/else/else if</code>，<code>goto</code> 或者 <code>switch/match</code> 这种语句。他们会转换成汇编代码中的 <code>jump</code> 指令。比如 x86 汇编的各种 <code>j</code> 开头的 <code>jump</code> 指令：</p>
+<table>
+<thead><tr>
+<th>指令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jmp</td>
+<td>Always jump</td>
+</tr>
+<tr>
+<td>je</td>
+<td>Jump if cmp is equal</td>
+</tr>
+<tr>
+<td>jne</td>
+<td>Jump if cmp is not equal</td>
+</tr>
+<tr>
+<td>jg</td>
+<td>Signed &gt; (greater)</td>
+</tr>
+<tr>
+<td>jge</td>
+<td>Signed &gt;=</td>
+</tr>
+<tr>
+<td>jl</td>
+<td>Signed &lt; (less than)</td>
+</tr>
+<tr>
+<td>jle</td>
+<td>Signed &lt;=</td>
+</tr>
+<tr>
+<td>ja</td>
+<td>Unsigned &gt; (above)</td>
+</tr>
+<tr>
+<td>jae</td>
+<td>Unsigned &gt;=</td>
+</tr>
+<tr>
+<td>jb</td>
+<td>Unsigned &lt; (below)</td>
+</tr>
+<tr>
+<td>jbe</td>
+<td>Unsigned &lt;=</td>
+</tr>
+<tr>
+<td>jecxz</td>
+<td>Jump if ecx is 0</td>
+</tr>
+<tr>
+<td>jc</td>
+<td>Jump if carry: used for unsigned overflow, or multiprecision add</td>
+</tr>
+<tr>
+<td>jo</td>
+<td>Jump if there was signed overflow</td>
+</tr>
+</tbody>
+</table>
+<p>比如我们随便写一段包含 <code>if/else</code> 逻辑的代码，编译之后的汇编代码中就会包含类似的 <code>jump</code> 指令：</p>
+<div class="hll"><pre><span></span><span class="cp">#![allow(unused_assignments)]</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 接收用户从命令行中输入的参数</span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">a</span>: <span class="kt">usize</span> <span class="o">=</span><span class="w"> </span><span class="n">std</span>::<span class="n">env</span>::<span class="n">args</span><span class="p">().</span><span class="n">nth</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">unwrap</span><span class="p">().</span><span class="n">parse</span><span class="p">().</span><span class="n">unwrap_or_default</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">42</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>这段代码逻辑这么写主要是为了保持汇编指令的尽量简单。这里是对应的汇编代码，只保留了跟 <code>if/else</code> 有关的部分，完整的代码链接在这里：<a href="https://rust.godbolt.org/z/ahcKcK1Er">https://rust.godbolt.org/z/ahcKcK1Er</a>。</p>
+<div class="hll"><pre><span></span><span class="nl">.LBB99_7:</span>
+        <span class="nf">cmp</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">42</span> <span class="c1">; if a &gt; 42</span>
+        <span class="nf">jbe</span>     <span class="no">.LBB99_10</span>
+        <span class="nf">mov</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">1</span>  <span class="c1">; a = 1</span>
+        <span class="nf">jmp</span>     <span class="no">.LBB99_11</span>
+<span class="nl">.LBB99_10:</span>
+        <span class="nf">mov</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">0</span>  <span class="c1">; a = 0</span>
+<span class="nl">.LBB99_11:</span>
+        <span class="nf">add</span>     <span class="no">rsp</span><span class="p">,</span> <span class="mi">200</span>
+        <span class="nf">ret</span>
+</pre></div>
+<p>我在代码里面加了几条注释（汇编里面用分号注释）表明了该条指令对应的 Rust 代码，可以看出来 <code>jbe</code> 指令会判断是否跳转到 <code>.LBB99_10</code> 还是不跳转继续执行下面的 <code>mov</code>。</p>
+<p>了解了分支是什么之后还不够，我们依然不知道具体是为啥 CPU 需要做分支预测。接下来我们需要了解一下另外一个概念：<strong>指令流水线</strong>。</p>
+<h3 id="zhi-ling-liu-shui-xian-instruction-pipelining">指令流水线(instruction pipelining)</h3><p><strong>指令流水线</strong>是从 <strong>instruction pipelining</strong> 翻译过来的一个名词，主要是指为了提高单个处理器指令处理效率的一种技术，早在上个世纪 70 年代的芯片就有这种技术了。</p>
+<p>CPU 处理一条指令一般要分为几个步骤：</p>
+<ul>
+<li>取指令(Instruction Fetch)</li>
+<li>解指令(Instruction Decode)</li>
+<li>执行指令 (Execute)</li>
+<li>回写结果到寄存器 (Register write back)</li>
+</ul>
+<p>这非常类似工厂生产某件需要多道工序的商品一样。想象一下，如果工厂每次都是完整的按照工序把第一件商品生产出来之后再进行同样的步骤生产下一件商品的话，这个生产速度得多慢！所以 19 世纪人类就诞生了工业化的流水线，把所有这些工序分解并行化。第一件商品在工序(2)的时候，丝毫不影响第二件商品进入工序(1)。指令也完全可以这样，CPU 可以把指令执行过程流水线化，把不同的指令执行步骤分给不同的逻辑门 (<a href="https://en.wikipedia.org/wiki/Logic_gate">logic stage</a>)处理，第一条指令进入<strong>解指令</strong>阶段的时候，第二条指令就可以进入<strong>取指令</strong>阶段了。</p>
+<p>Wikipedia 上的这张图可以帮助理解（图中文字颜色为黑色，推荐用 Light 主题查看）。</p>
+<p><img src="https://tech-proxy.bytedance.net/tos/images/1619425151814_f7494ad0023bab63d978e0c30cc5d13b.png" alt="instruction-pipeline.png"></p>
+<p>了解前面的这些概念之后，我们来看一下为什么 CPU 需要做分支预测？</p>
+<h3 id="wei-shi-yao-xu-yao-fen-zhi-yu-ce">为什么需要分支预测？</h3><p><strong>指令流水线</strong>会按照工厂流水线一样执行指令，这其中也包括前面讲的 <strong>jump</strong> 指令。而 <strong>jump</strong> 指令有一个问题就是它需要知道下一个时钟周期该跳转还是不跳转，而这需要等前面的判断逻辑执行完了之后才知道。比如上面的例子 <strong>cmp</strong> 判断完之后，<code>jump</code> 指令才能决定是跳转到 <code>.LBB99_10</code> 部分，还是不跳转继续执行下去。但是 CPU 指令流水线才不会等，否则白白的浪费一个时钟周期。所以人们发明了一种办法来避免出现这种问题，这就是<strong>分支预测</strong>。</p>
+<p>CPU 的分支预测器会提前预测这条 <strong>jump</strong> 指令可能会跳转的到哪个分支，然后把预测的那条分支放到流水线中去执行。如果预测正确，CPU 可以继续执行后面的指令；如果预测失败了(branch misprediction)，那只能丢弃刚刚执行的分支结果，重新切换到正确的分支执行。可以看到，如果出现过多的预测失败，分支预测反而很影响性能。不过现在 CPU 的分支预测器经过这么多年的发展已经越来越先进了，人们会采用各种方式不断提高分支预测器的预测准确率，详细可以查看 Wikipedia 的 <a href="https://en.wikipedia.org/wiki/Branch_predictor">Branch_predictor</a> 了解更多。</p>
+<h3 id="re-xun-huan-zhong-bi-mian-fen-zhi-yu-ce">热循环中避免分支预测</h3><p>虽然现代 CPU 都有分支预测器，但我们在软件层面依然要尽量避免发生分支预测，特别是在热循环中。最常用的优化方法就是避免在循环中写 <code>if/else</code> 语句，即 <code>branchless code</code>。标准库中有大量这种 <code>branchless code</code> 的案例来优化性能，比如 <code>std::collection::Filter</code> 的 <code>count()</code> 方法。</p>
+<div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span> <span class="nc">Filter</span><span class="o">&lt;</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">iter</span>: <span class="nc">I</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">predicate</span>: <span class="nc">P</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">I</span>: <span class="nb">Iterator</span><span class="p">,</span><span class="w"> </span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="nb">Iterator</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Filter</span><span class="o">&lt;</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">P</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">where</span><span class="w"></span>
+<span class="w">    </span><span class="n">P</span>: <span class="nb">FnMut</span><span class="p">(</span><span class="o">&amp;</span><span class="n">I</span>::<span class="n">Item</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">bool</span><span class="p">,</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Item</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">I</span>::<span class="n">Item</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// this special case allows the compiler to make `.filter(_).count()`</span>
+<span class="w">    </span><span class="c1">// branchless. Barring perfect branch prediction (which is unattainable in</span>
+<span class="w">    </span><span class="c1">// the general case), this will be much faster in &gt;90% of cases (containing</span>
+<span class="w">    </span><span class="c1">// virtually all real workloads) and only a tiny bit slower in the rest.</span>
+<span class="w">    </span><span class="c1">//</span>
+<span class="w">    </span><span class="c1">// Having this specialization thus allows us to write `.filter(p).count()`</span>
+<span class="w">    </span><span class="c1">// where we would otherwise write `.map(|x| p(x) as usize).sum()`, which is</span>
+<span class="w">    </span><span class="c1">// less readable and also less backwards-compatible to Rust before 1.10.</span>
+<span class="w">    </span><span class="c1">//</span>
+<span class="w">    </span><span class="c1">// Using the branchless version will also simplify the LLVM byte code, thus</span>
+<span class="w">    </span><span class="c1">// leaving more budget for LLVM optimizations.</span>
+<span class="w">    </span><span class="cp">#[inline]</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">usize</span> <span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="cp">#[inline]</span><span class="w"></span>
+<span class="w">        </span><span class="k">fn</span> <span class="nf">to_usize</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">predicate</span>: <span class="nc">impl</span><span class="w"> </span><span class="nb">FnMut</span><span class="p">(</span><span class="o">&amp;</span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">bool</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">impl</span><span class="w"> </span><span class="nb">FnMut</span><span class="p">(</span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">usize</span> <span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="n">predicate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">iter</span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="n">to_usize</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">predicate</span><span class="p">)).</span><span class="n">sum</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>标准库的 <code>Filter</code> 类型在实现 <code>Iterator</code> 的时候重写了 <code>count()</code> 方法。想想如果我们没有意识到分支预测这个问题的情况下可能会这么实现：</p>
+<div class="hll"><pre><span></span><span class="c1">// Bad</span>
+<span class="cp">#[inline]</span><span class="w"></span>
+<span class="k">fn</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kt">usize</span> <span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="bp">self</span><span class="p">.</span><span class="n">iter</span><span class="p">.</span><span class="n">for_each</span><span class="p">(</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">predicate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">sum</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>但这种实现在循环中有一个 <code>if</code> 语句，导致 CPU 需要进行大量的分支预测，而这些分支预测几乎都是随机的，CPU 很难根据历史记录提高预测的准确度，导致性能会比较低。而标准库的实现完全是 branchless 的，不仅性能好很多，而且也能方便 LLVM 做更多优化。</p>
+<blockquote><ul>
+<li><p>关于怎样写好 <code>branchless code</code> 来优化性能又是另一个值得专门讨论的主题了，网上也有大量资料可以学习。但是 <code>branchless code</code> 会牺牲不少代码可读性，并不建议盲目的使用。</p>
+</li>
+<li><p><code>branchless code</code> 的额外好处是还能帮助避免遭受<strong>旁路攻击</strong>(英文 timing attack 或者 side-channel attack)。参考：<a href="https://en.wikipedia.org/wiki/Timing_attack">https://en.wikipedia.org/wiki/Timing_attack</a>。</p>
+</li>
+</ul>
+</blockquote>
+<p>继续回到我们刚才的那个 PR。我们的版本比标准库旧的版本在某些 case 下性能要低确实跟分支预测有关，因为我们的代码多了一种分支需要预测。</p>
+<p>为了方便大家对比，我把汇编的截图贴到下面。我们只需要关注我标记文字的那几个颜色就可以。很容易看出来新版实现多了一个 <code>jne</code> 的跳转指令，导致 CPU 需要多做一次分支预测。</p>
+<blockquote><p>申明：启用 <code>-O</code> 参数之后汇编指令会被优化得更精简，这里没有启用 <code>-O</code> 是为了对应到每一行源码方便对比。</p>
+</blockquote>
+<ul>
+<li>标准库的汇编截图</li>
+</ul>
+<p><img src="https://tech-proxy.bytedance.net/tos/images/1619425164057_75849b328b34fde651b31c73461fbf22.png" alt="branch-compare.png"></p>
+<ul>
+<li>优化(1)的汇编截图</li>
+</ul>
+<p><img src="https://tech-proxy.bytedance.net/tos/images/1619425171204_3f4fd6867f0b188e20abb8a782e42d85.png" alt="branch-compare2.png"></p>
+<blockquote><p>需要注意的是 <code>jmp</code> 指令是直接跳转，不需要进行分支预测。感兴趣的朋友可以看一下我在 Godbolt 上的对比：<a href="https://rust.godbolt.org/z/8dGbY8Pe1">https://rust.godbolt.org/z/8dGbY8Pe1</a>。这个网站是神器，强烈推荐！</p>
+</blockquote>
+<h2 id="you-hua-2">优化（2）</h2><p>所以我推测原作者实现标准库的 <code>binary_search_by()</code> 的时候不考虑 <code>O(1)</code> 最好时间复杂度的可能原因之一就是为了避免多余的分支预测。因为你要想 <code>O(1)</code> 就避免不了提前 return，要想提前 return 你就避免不了分支判断。那怎么办呢？PR 里面有一个大牛 <a href="https://github.com/tesuji">tesuji</a> 提供了一种思路：既然我们避免不了分支预测，那我们尽量帮助 CPU 更好的做好分支预测吧。于是我采用了他的方案，具体 commit 在<a href="https://github.com/rust-lang/rust/commit/7d078cfb94fa75e5dee699535f3f9781d3a1d47d">这里</a>，我们暂且叫它<strong>优化(2)</strong>：</p>
+<div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">binary_search_by</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">f</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="kt">usize</span><span class="p">,</span><span class="w"> </span><span class="kt">usize</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">where</span><span class="w"></span>
+<span class="w">    </span><span class="n">F</span>: <span class="nb">FnMut</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Ordering</span><span class="p">,</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">len</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// never overflow because `slice::len()` max is `isize::MAX`.</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">left</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">right</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// SAFETY: the call is made safe by the following invariants:</span>
+<span class="w">        </span><span class="c1">// - `mid &gt;= 0`</span>
+<span class="w">        </span><span class="c1">// - `mid &lt; size`: `mid` is limited by `[left; right)` bound.</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">get_unchecked</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Less</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Greater</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">mid</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Err</span><span class="p">(</span><span class="n">left</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>优化(2)的代码明显比标准库和优化(1)的代码更容易理解，再看一下它的生成的汇编代码。</p>
+<p><img src="https://tech-proxy.bytedance.net/tos/images/1619425180081_c8ce6b3c584bcdc25f4aa28b0ffaae60.png" alt="branch-compare3.png"></p>
+<p>可以看出来依然是两条 <code>jne</code> 指令，所以非重复模式下的性能可能还是没有标准库的高，但是确实比优化(1)的性能要好很多。过了几天 libs 组的 <a href="https://github.com/m-ou-se">m-ou-se</a> 回复了<a href="https://github.com/rust-lang/rust/pull/74024#issuecomment-713818146">评论</a>。她也做了 benchmark，发现对于原生类型比如 <strong>u32</strong> 下 l1 级别的数据量依然比标准库慢，但是那些需要更多时间比较的类型（比如 String）的情况下，新的实现在所有 case 下性能都要优于标准库的实现。后面大家又讨论了许多，最终  <strong>m-ou-se</strong> 决定先跑一个 crater 测试，先验证一下这个 PR 对 crates.io 上所有的 crate 影响面大不大。最终 library 团队会议一致同意可以 merge 这个 PR。</p>
+<blockquote><p>关于 <a href="https://github.com/rust-lang/crater">crater</a> 测试：</p>
+<p>crater 大概就是针对整个 crates.io 上所有的 crate 给要测试的编译器版本（比如我的 PR ）跑一次测试，看这个改动对线上所有 crate 影响大不大。crates.io 上超过5万个 crate，一般跑一次 crater 需要将近一周的时间。我的这个 crater 跑完之后就是因为没有对已发布的 crate 造成什么很大的影响，所以官方才愿意合并。</p>
+<p>From <strong>m-ou-se</strong>:</p>
+<p>"We discussed this PR in a recent library team meeting, in which we agreed that the proposed behaviour (stopping on Equal) is preferrable over optimal efficiency in some specific niche cases. Especially considering how small most of the differences are in the benchmarks above."</p>
+<p>"The breakage in the crater report looks reasonably small. Also, now that <code>partition_point</code> is getting stabilized, there's a good alternative for those who want the old behaviour of <code>binary_search_by</code>. So we should go ahead and start on getting this merged. :)"</p>
+</blockquote>
+<h2 id="zheng-shu-yi-chu-wen-ti">整数溢出问题</h2><p>然而 <a href="https://github.com/scottmcm">scottmcm</a> 又指出了另外一个问题：</p>
+<div class="hll"><pre><span></span><span class="c1">// never overflow because `slice::len()` max is `isize::MAX`.</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">left</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">right</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+<p>这行代码在零大小类型(Zero Sized Type，简称 ZST)下却可能会 overflow! 我们来分析一下为什么。</p>
+<p><a href="https://doc.rust-lang.org/std/primitive.slice.html#method.len"><code>slice::len()</code></a> 的返回值是 <code>usize</code> 类型，但是对于非零大小的类型(non-ZST)，<code>slice::len()</code> 的值最大也只能是 <code>isize::MAX</code>。所以就像注释上写的那样 <code>(isize::MAX + isize::MAX) / 2</code> 是不可能超过 <code>usize::MAX</code> 的，所以不会发生 overflow。但是对于 ZST 类型就不一样了，如果 <code>slice</code> 里面所有元素都是零大小的（比如 <code>()</code>），那这个 <code>slice</code> 的长度完全可以达到 <code>usize::MAX</code>。虽然对于 <code>[(); usize::MAX].binary_search(&amp;())</code> 这种情况我们会在 <code>O(1)</code> 的时间复杂度上找到结果并马上返回，但是如果我们这么写 <code>b.binary_search_by(|_| Ordering::Less)</code>，它就发生整数溢出了。</p>
+<h3 id="wei-shi-yao-slice-len-dui-yu-non-zst-zui-da-zhi-shi-isize-ni">为什么 <code>slice::len()</code> 对于 non-ZST 最大值是 <code>isize</code> 呢？</h3><p>最简单直接的原因是我们不能构造一个所有元素都为 non-ZST 并且长度为 <code>usize::MAX</code> 的数组或 <code>slice</code>，编译器在编译阶段直接会报错。比如以最简单的只占 1 个字节的 <code>bool</code> 类型为例，<code>[bool; usize::MAX]</code> 的大小将等于 <code>std::mem::size_of::&lt;bool&gt;() * usize::MAX</code>, 这是一个很大的数字了，整个计算机地址空间都不够。</p>
+<div class="hll"><pre><span></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">std</span>::<span class="n">mem</span>::<span class="n">size_of</span>::<span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// error: values of the type `[bool; 18446744073709551615]` are too big </span>
+<span class="w">    </span><span class="c1">// for the current architecture</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="kt">usize</span>::<span class="n">MAX</span><span class="p">];</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>但是对于 ZST 是可以的，因为 <code>std::mem::size_of::&lt;()&gt;() * usize::MAX</code> 依然是零。</p>
+<div class="hll"><pre><span></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">std</span>::<span class="n">mem</span>::<span class="n">size_of</span>::<span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[();</span><span class="w"> </span><span class="kt">usize</span>::<span class="n">MAX</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span><span class="w"> </span><span class="kt">usize</span>::<span class="n">MAX</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>不过上面的解释依然不够严谨，比如 <code>std::mem::size_of::&lt;bool&gt;() * isize::MAX</code> 也依然是一个很大的数字呀，为啥 <code>isize::MAX</code> 就可以？根本原因在于 Rust 指针寻址最大 offset 只允许 <code>isize::MAX</code>，至于为什么是 <code>isize::MAX</code>，<a href="https://doc.rust-lang.org/std/primitive.pointer.html#method.offset"><code>std::pointer::offset()</code></a> 的文档有解释。另外也可以看一下 <a href="https://doc.rust-lang.org/std/slice/fn.from_raw_parts.html"><code>std::slice::from_raw_parts()</code></a> 的文档。而对于 ZST 的类型，编译器会做优化，它压根不需要寻址，所以最大大小可以是 <code>usize::MAX</code>。</p>
+<h2 id="zui-zhong-ban-ben">最终版本</h2><p>意识到整数溢出的问题之后，解决方式也比较简单，这是我当时的<a href="https://github.com/rust-lang/rust/pull/74024/commits/3eb5bee242fae12c4cf547bfe0665653c20ca0c2">提交</a>，并且还增加了针对 overflow 的单元测试。</p>
+<div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">binary_search_by</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">f</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nb">Result</span><span class="o">&lt;</span><span class="kt">usize</span><span class="p">,</span><span class="w"> </span><span class="kt">usize</span><span class="o">&gt;</span><span class="w"></span>
+<span class="w">    </span><span class="k">where</span><span class="w"></span>
+<span class="w">        </span><span class="n">F</span>: <span class="nb">FnMut</span><span class="p">(</span><span class="o">&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Ordering</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">len</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="c1">// SAFETY: the call is made safe by the following invariants:</span>
+<span class="w">            </span><span class="c1">// - `mid &gt;= 0`</span>
+<span class="w">            </span><span class="c1">// - `mid &lt; size`: `mid` is limited by `[left; right)` bound.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">get_unchecked</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// The reason why we use if/else control flow rather than match</span>
+<span class="w">            </span><span class="c1">// is because match reorders comparison operations, which is </span>
+<span class="w">            </span><span class="c1">// perf sensitive.</span>
+<span class="w">            </span><span class="c1">// This is x86 asm for u8: https://rust.godbolt.org/z/8Y8Pra.</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Less</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">cmp</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Greater</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mid</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="n">mid</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">left</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="nb">Err</span><span class="p">(</span><span class="n">left</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="cp">#[test]</span><span class="w"></span>
+<span class="k">fn</span> <span class="nf">test_binary_search_by_overflow</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[();</span><span class="w"> </span><span class="kt">usize</span>::<span class="n">MAX</span><span class="p">];</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">_</span><span class="o">|</span><span class="w"> </span><span class="n">Ordering</span>::<span class="n">Equal</span><span class="p">),</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(</span><span class="kt">usize</span>::<span class="n">MAX</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">_</span><span class="o">|</span><span class="w"> </span><span class="n">Ordering</span>::<span class="n">Greater</span><span class="p">),</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="n">binary_search_by</span><span class="p">(</span><span class="o">|</span><span class="n">_</span><span class="o">|</span><span class="w"> </span><span class="n">Ordering</span>::<span class="n">Less</span><span class="p">),</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="kt">usize</span>::<span class="n">MAX</span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>我们确实应该尽量避免写 <code>let mid = (left + right) / 2</code> 这种很容易发生整数溢出的代码，换成 <code>let mid = left + size / 2</code> 这种，可以避免发生 overflow。</p>
+<p>另外还有人问为什么这里使用 <code>if/else</code> 而不是 <code>match</code> 语句？我们查看两个版本的汇编指令后发现 <code>match</code> 版本生成的汇编代码不仅指令更多而且还重排了 <code>cmp</code> 指令的顺序，性能似乎更差。理论上这两个版本生成的汇编指令应该可以做到一致的，我暂时没有深究原因为什么 <code>match</code> 版本的汇编会差一些，其他读者感兴趣可以研究一下。</p>
+<h2 id="zong-jie">总结</h2><p>表面波澜不惊，实则暗流涌动。一个看起来十分简单的 PR 里面其实涉及到很多内容。学无止境，笔者通过这个 PR 收获了很多，现在分享出来同时也希望能够激励更多国内开发者参与进来。Rust 社区文化是如此开放和包容，任何人只要发现有可以改进的地方都可以随时给 Rust 仓库提交 PR 或 issue，这样做不仅能帮助 Rust 越来越好，你自己也会得到巨大的成长和收获！</p>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="table-of-content">
+        <div class="sticky">
+            <b class="pipe-title">Table of content</b>
+            <ul class="toc">
+                
+                <li>
+                    <a href="#fen-zhi-yu-ce-branch-prediction">分支预测(Branch prediction)</a>
+                    
+                    <ul>
+                <li>
+                    <a href="#fen-zhi">分支</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#zhi-ling-liu-shui-xian-instruction-pipelining">指令流水线(instruction pipelining)</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#wei-shi-yao-xu-yao-fen-zhi-yu-ce">为什么需要分支预测？</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#re-xun-huan-zhong-bi-mian-fen-zhi-yu-ce">热循环中避免分支预测</a>
+                    
+                </li>
+                </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="#you-hua-2">优化（2）</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#zheng-shu-yi-chu-wen-ti">整数溢出问题</a>
+                    
+                    <ul>
+                <li>
+                    <a href="#wei-shi-yao-slice-len-dui-yu-non-zst-zui-da-zhi-shi-isize-ni">为什么 <code>slice::len()</code> 对于 non-ZST 最大值是 <code>isize</code> 呢？</a>
+                    
+                </li>
+                </ul>
+                    
+                </li>
+                
+                <li>
+                    <a href="#zui-zhong-ban-ben">最终版本</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#zong-jie">总结</a>
+                    
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+    
+</div>
+<script src="/static/app.js?h=f1487eff"></script>
+</body>

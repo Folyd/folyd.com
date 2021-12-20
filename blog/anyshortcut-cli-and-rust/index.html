@@ -1,0 +1,211 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1c45a5">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/pygments.css">
+<title>发布 Anyshortcut CLI 版以及 Rust 使用半年之后的感受 — Folyd</title>
+
+<body>
+<div class="page">
+    <div class="header-navigator">
+        <div id="menu-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" role="presentation">
+                <path d="M5 15h14v2H5zm0-8h14v2H5zm0 4h14v2H5z" fill="currentColor" fill-rule="evenodd"></path>
+            </svg>
+        </div>
+        <a href="/">
+            <img src="/img/logo-white.svg" alt="folyd" style="height: 14px">
+        </a>
+    </div>
+
+    <div class="navigator-container">
+        <div class="navigator">
+            <div id="close-menu-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" role="presentation">
+                    <path d="M12 10.586L6.707 5.293a1 1 0 0 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 0 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 1 0-1.414-1.414L12 10.586z"
+                          fill="currentColor">
+                    </path>
+                </svg>
+            </div>
+            <div class="menu has-background-primary">
+                <a href="/">
+                    <img src="/img/logo-white.svg" alt="folyd" style="margin:15px 0;height:12px;">
+                </a>
+                <nav class="nav">
+                    
+                    <a  class="active" 
+                       href="/blog/" title="Blog - What I thought and wrote">
+                        <img class="nav-image-item" src="/img/icon-blog.svg?h=8a78423e" alt="">
+                    </a>
+                    
+                    <a 
+                       href="/projects/" title="Projects - What I built and created">
+                        <img class="nav-image-item" src="/img/icon-project.svg?h=033d057d" alt="">
+                    </a>
+                    
+                    <a 
+                       href="/about/" title="About - Who is me and how to contact me">
+                        <img class="nav-image-item" src="/img/icon-about.svg?h=700c2d4e" alt="">
+                    </a>
+                    
+                </nav>
+            </div>
+            
+  
+  
+    <div class="tabs-container">
+    <div class="tabs">
+        <div class="tabs-menu">
+            <span>
+                <img src="/img/b.png?h=dfedffda" alt="" 
+                     style="vertical-align: middle;margin-right:8px">
+            </span>
+            <span class="subtitle">Blog</span>
+        </div>
+        <div class="tabs-list">
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/rust-binary-search-pr/">
+                    优化 Rust 标准库的 binary_search
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/rust-pin-unpin/">
+                    Rust 的 Pin 与 Unpin
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/rust-generator-experimental/">
+                    Rust 未来 Generator 语法探索之 Propane
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/moonlit-sailor/">
+                    Moonlit Sailor - 我的年度乐队
+                </a>
+            
+                 
+                    
+                
+                <a class="tabs-list-item active" href="/blog/anyshortcut-cli-and-rust/">
+                    发布 Anyshortcut CLI 版以及 Rust 使用半年之后的感受
+                </a>
+            
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/the-origin-of-folyd/">
+                    Folyd 的由来
+                </a>
+            
+        </div>
+    </div>
+</div>
+  
+
+        </div>
+    </div>
+
+
+    <div class="body-container content">
+        
+        <div class="body text">
+            
+                <div class="heading">发布 Anyshortcut CLI 版以及 Rust 使用半年之后的感受</div>
+    
+        <div style="font-size: 14px;color: #999;">
+            -- 发布于2018-10-21
+        </div>
+    
+    <br>
+    <p><a href="https://anyshortcut.com">Anyshortcut</a>是我发布于2017年12月的Chrome/Firefox效率插件，一直坚持订阅制收费，
+到目前为止注册用户将近1000位，使用信用卡订阅用户接近3%吧。</p>
+<p>大半年前接触到Rust，被这门语言深深折服，于是从官方文档开始学习Rust，入门之后写了一个<strong>Anyshortcut CLI</strong>版。</p>
+<h3 id="github-repository">项目地址 </h3><p><a href="https://github.com/anyshortcut/anyshortcut-cli">https://github.com/anyshortcut/anyshortcut-cli</a></p>
+<p>自认为这个项目很适合Rust初学者学习。</p>
+<p><img src="https://github.com/anyshortcut/anyshortcut-cli/raw/master/anyshortcut-cli.jpg" alt=""></p>
+<h3 id="how-anyshortcut-cli-works">命令行的Anyshortcut可以干什么？ </h3><p>因为Anyshortcut的快捷键是可以同步的，对于CLI程序是通过Access token来访问后端API来同步快捷键的。Access token可以在官网用户中心找到。
+<img src="https://ws1.sinaimg.cn/large/006tNbRwly1fwf33zungwj31kw0q6793.jpg" alt=""></p>
+<p>用Access token登录之后即可把所有快捷键同步下来，然后可以使用命令行快速打开网页。</p>
+<p>比如，我给<a href="https://www.google.com">https://www.google.com</a> 绑定了快捷键<strong>G</strong>，那就可以输入<strong>as g</strong>快速用默认浏览器打开Google。</p>
+<pre><code>$ as g
+Url: https://www.google.com/
+</code></pre>
+<p>其他的混合快捷键、二级快捷键也是类似，就不再介绍了。</p>
+<p>当然这里的命令<strong>as</strong>是<strong>anyshortcut</strong>的别名，要不然名字太长了，根本就算不上效率工具了。</p>
+<div class="hll"><pre><span></span><span class="nb">alias</span> <span class="nv">as</span><span class="o">=</span><span class="k">$(</span>which anyshortcut<span class="k">)</span>
+</pre></div>
+<h3 id="how-to-install">怎么安装 </h3><ul>
+<li>如果你是Rust 开发者，很简单，用<em>cargo install</em>就行。</li>
+</ul>
+<pre><code>cargo install anyshortcut
+</code></pre>
+<ul>
+<li>当然我也提交了Homebrew，但是因为GitHub repository not notable enough (&lt;30 forks, &lt;30 watchers and &lt;75 stars)
+的原因暂时没有被merge，希望以后能达到这个要求。Merge之后就可以通过brew安装了。</li>
+</ul>
+<pre><code>brew install anyshortcut
+</code></pre>
+<h3 id="what-i-thought-after-half-year-rust-programming">使用Rust半年之后的感想 </h3><blockquote><p>申明：除了Rust 之外我个人熟悉的编程语言只有C++ 2003, Java, Python, Javascript, Groovy，我并没有研究过各种编程语言，
+甚至Ruby、Go、Swift、Kotlin、Scala，Haskell等我都一律没有去学过，所以这些只能算比较浅显的感想。</p>
+</blockquote>
+<ul>
+<li><p><strong>相识恨晚。</strong> 其实我大概16年的时候才知道的Rust，当时认识几个不错的程序员在写一些Rust的项目，不过我还不以为然，以为又是一门什么赚噱头的新语言，就没有太多的关注它。直到今年初机缘巧合才真正的激发我学Rust的强烈兴趣。目前我也看到了好几位和我一样学了Rust之后发表<strong>Rust真香</strong>的赞叹！</p>
+</li>
+<li><p><strong>概念很多，门槛很高。</strong> Rust是一门对标C/C++的系统级编程语言，它在既能处理好内存安全、线程安全的这些问题的同时也支持各种现代编程语言的特性，比如函数式、错误处理、并发处理、依赖管理等。写起来还是比较优雅的。当然Rust没有自动GC，所以它引入了很多Rust独有的新概念，比如生命周期、所有权、借用等让初学者非常不适应。</p>
+</li>
+<li><p><strong>优秀的依赖管理和文档生成工具。</strong> Rust的Cargo绝对是我用过的所有语言里面最好的依赖管理工具，非常省心人性化。Cargo提供的文档生成体验也很棒，这才是现代化的编程语言应该具有的。</p>
+</li>
+<li><p><strong>越写越爱不释手。</strong> 写Rust最难过的一关就是编译器，你会被它折磨的心累，太严格太死板了，稍微不对就会编译不过。当然Rust官方也在优化这一点，比如NLL。但是只要你过了编译器这一关，编译没问题，线上运行绝对没有问题(Unsafe的代码、内存泄漏或溢出除外）,不像Java编译过了，线上还有可能出现NPE啊啥的。编译成功之后非常放心，几乎不需要花时间去线上复现解决那些诡异的bug。</p>
+</li>
+<li><p><strong>国内很冷门，但前景很看好。</strong>  Rust在国内确实太冷门了，目前社区也很少，Rust相关的会议更是寥寥无几，招聘Rust的职位非常少，除了蚂蚁金服、今日头条、Pingcap和区块链公司，其他公司的职位几乎没有。另外Rust也还缺少明星级的项目，这些都需要时间去沉淀吧。目前国内学Rust的基本上都是出于情怀和对这门语言的喜爱。Rust不管是在系统级编程、网络编程、并发编程、嵌入式、WebAssembly等方面都在发力，德国越来越多的公司在使用Rust应用于他们的工业4.0，甩我们多少条街？Github发布的2018年终总结提到Rust是增长速度最快的编程语言第五位。我学Rust也是出于情怀，但是我还是相信Rust在全世界的前景还是非常光明的（没有特指中国）。</p>
+</li>
+</ul>
+
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="table-of-content">
+        <div class="sticky">
+            <b class="pipe-title">Table of content</b>
+            <ul class="toc">
+                
+                <li>
+                    <a href="#github-repository">项目地址</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#how-anyshortcut-cli-works">命令行的Anyshortcut可以干什么？</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#how-to-install">怎么安装</a>
+                    
+                </li>
+                
+                <li>
+                    <a href="#what-i-thought-after-half-year-rust-programming">使用Rust半年之后的感想</a>
+                    
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+    
+</div>
+<script src="/static/app.js?h=f1487eff"></script>
+</body>

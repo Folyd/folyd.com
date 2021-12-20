@@ -1,0 +1,2 @@
+document.getElementById("menu-button").addEventListener("click",(function(e){var t=document.querySelector(".navigator-container");t.style.position="fixed",t.style.display="block"})),document.getElementById("close-menu-button").addEventListener("click",(function(e){document.querySelector(".navigator-container").style.display="none"}));
+//# sourceMappingURL=app.js.map
