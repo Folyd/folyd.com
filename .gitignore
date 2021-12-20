@@ -5,3 +5,5 @@ assets/static/
 packages/*/*.egg-info
 *.py[co]
 __pycache__
+dist
+package-lock.json
