@@ -34,8 +34,6 @@ class MarkdownHeaderAnchorsPlugin(Plugin):
                     # However this is a pretty workaround and useful way for
                     # those non-ascii languages, such as CJK to use the
                     # custom anchor as the slug.
-                    # `# 中文标题 (#chinese-title)` renders to
-                    # <h1 id="chinese-title">中文标题</h1>
                     match = re.search(r'(.*)\(#(.*)\)', text)
                     if match:
                         text, anchor = match.groups()
