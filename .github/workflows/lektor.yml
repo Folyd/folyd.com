@@ -9,19 +9,12 @@ jobs:
   deploy:
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
+      with:
+        ref: 'master'
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-    - name: Install lektor
-      run: |
-        python -m pip install --upgrade pip
-        pip install lektor
-    - name: Build lektor
-      run: lektor build -f webpack
-    - name: Deploy to Github pages
-      env:
-        LEKTOR_DEPLOY_USERNAME: ${{ secrets.LEKTOR_DEPLOY_USERNAME }}
-        LEKTOR_DEPLOY_PASSWORD: ${{ secrets.LEKTOR_DEPLOY_PASSWORD }}
-      run: lektor deploy ghpages
+    - name: Deploy
+      run: ./deploy.sh
