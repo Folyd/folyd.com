@@ -62,6 +62,9 @@
                      style="vertical-align: middle;margin-right:8px">
             </span>
             <span class="subtitle">Blog</span>
+            <a href="feed.xml" title="Atom Feed" aria-label="Atom Feed" style="padding: 10px; vertical-align: middle; margin-left: auto;">
+                <img src="/img/rss.svg" alt="RSS">
+            </a>
         </div>
         <div class="tabs-list">
             
@@ -295,16 +298,16 @@ test slice::binary_search_l3_with_dups ... bench:         157 ns/iter (+/- 6)
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 <p>这段代码逻辑这么写主要是为了保持汇编指令的尽量简单。这里是对应的汇编代码，只保留了跟 <code>if/else</code> 有关的部分，完整的代码链接在这里：<a href="https://rust.godbolt.org/z/ahcKcK1Er">https://rust.godbolt.org/z/ahcKcK1Er</a>。</p>
-<div class="hll"><pre><span></span><span class="nl">.LBB99_7:</span>
-        <span class="nf">cmp</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">42</span> <span class="c1">; if a &gt; 42</span>
-        <span class="nf">jbe</span>     <span class="no">.LBB99_10</span>
-        <span class="nf">mov</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">1</span>  <span class="c1">; a = 1</span>
-        <span class="nf">jmp</span>     <span class="no">.LBB99_11</span>
-<span class="nl">.LBB99_10:</span>
-        <span class="nf">mov</span>     <span class="no">qword</span> <span class="no">ptr</span> <span class="p">[</span><span class="no">rsp</span> <span class="err">+</span> <span class="mi">56</span><span class="p">],</span> <span class="mi">0</span>  <span class="c1">; a = 0</span>
-<span class="nl">.LBB99_11:</span>
-        <span class="nf">add</span>     <span class="no">rsp</span><span class="p">,</span> <span class="mi">200</span>
-        <span class="nf">ret</span>
+<div class="hll"><pre><span></span><span class="nl">.LBB99_7:</span><span class="w"></span>
+<span class="w">        </span><span class="nf">cmp</span><span class="w">     </span><span class="no">qword</span><span class="w"> </span><span class="no">ptr</span><span class="w"> </span><span class="p">[</span><span class="no">rsp</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="mi">56</span><span class="p">],</span><span class="w"> </span><span class="mi">42</span><span class="w"> </span><span class="c1">; if a &gt; 42</span>
+<span class="w">        </span><span class="nf">jbe</span><span class="w">     </span><span class="no">.LBB99_10</span><span class="w"></span>
+<span class="w">        </span><span class="nf">mov</span><span class="w">     </span><span class="no">qword</span><span class="w"> </span><span class="no">ptr</span><span class="w"> </span><span class="p">[</span><span class="no">rsp</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="mi">56</span><span class="p">],</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="c1">; a = 1</span>
+<span class="w">        </span><span class="nf">jmp</span><span class="w">     </span><span class="no">.LBB99_11</span><span class="w"></span>
+<span class="nl">.LBB99_10:</span><span class="w"></span>
+<span class="w">        </span><span class="nf">mov</span><span class="w">     </span><span class="no">qword</span><span class="w"> </span><span class="no">ptr</span><span class="w"> </span><span class="p">[</span><span class="no">rsp</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="mi">56</span><span class="p">],</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="c1">; a = 0</span>
+<span class="nl">.LBB99_11:</span><span class="w"></span>
+<span class="w">        </span><span class="nf">add</span><span class="w">     </span><span class="no">rsp</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="w"></span>
+<span class="w">        </span><span class="nf">ret</span><span class="w"></span>
 </pre></div>
 <p>我在代码里面加了几条注释（汇编里面用分号注释）表明了该条指令对应的 Rust 代码，可以看出来 <code>jbe</code> 指令会判断是否跳转到 <code>.LBB99_10</code> 还是不跳转继续执行下面的 <code>mov</code>。</p>
 <p>了解了分支是什么之后还不够，我们依然不知道具体是为啥 CPU 需要做分支预测。接下来我们需要了解一下另外一个概念：<strong>指令流水线</strong>。</p>
