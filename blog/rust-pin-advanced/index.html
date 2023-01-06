@@ -68,6 +68,13 @@
         </div>
         <div class="tabs-list">
             
+                
+                    
+                
+                <a class="tabs-list-item" href="/blog/2022/">
+                    我的 2022 总结
+                </a>
+            
                  
                     
                 
@@ -140,49 +147,49 @@
     <p>去年我写了一篇关于 Pin 的文章，算是由浅入深介绍了 Pin 到底是怎么一回事，为什么需要 Pin。但只掌握那部分知识依然不够，所以这篇文章希望能系统性的梳理跟 Pin 有关的知识点，所以标题我命名为《Rust Pin 进阶》。</p>
 <h2 id="pin-api-pou-xi">Pin API 剖析</h2><p>要想深入理解 Pin，熟悉 Pin 所有的方法是必不可少的。除去 nightly 的 API 后，Pin 总共有 13 个方法：</p>
 <div class="hll"><pre><span></span><span class="c1">// Pin&lt;P&gt; where P: Deref</span>
-<span class="k">impl</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new_unchecked</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">impl</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new_unchecked</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span>
 
-<span class="w">  </span><span class="k">fn</span> <span class="nf">as_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">as_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span>
 
-<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner_unchecked</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner_unchecked</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">Deref</span><span class="o">&lt;</span><span class="n">Target</span>: <span class="nb">Unpin</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">Deref</span><span class="o">&lt;</span><span class="n">Target</span>: <span class="nb">Unpin</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span>
 
-<span class="w">  </span><span class="k">fn</span> <span class="nf">into_inner</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">into_inner</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">map_unchecked</span><span class="o">&lt;</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">func</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span><span class="w"></span>
-<span class="w">    </span><span class="k">where</span><span class="w"></span>
-<span class="w">        </span><span class="n">U</span>: <span class="o">?</span><span class="nb">Sized</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="n">F</span>: <span class="nb">FnOnce</span><span class="p">(</span><span class="o">&amp;</span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">U</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">map_unchecked</span><span class="o">&lt;</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">func</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">where</span>
+<span class="w">        </span><span class="n">U</span>: <span class="o">?</span><span class="nb">Sized</span><span class="p">,</span>
+<span class="w">        </span><span class="n">F</span>: <span class="nb">FnOnce</span><span class="p">(</span><span class="o">&amp;</span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">U</span>
 
-<span class="w">  </span><span class="k">fn</span> <span class="nf">get_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">T</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">get_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">T</span>
+<span class="p">}</span>
 
 
 <span class="c1">// Pin&lt;P&gt; where P: DerefMut</span>
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">DerefMut</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">fn</span> <span class="nf">as_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">DerefMut</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">as_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span>
 
 <span class="w">  </span><span class="k">fn</span> <span class="nf">set</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">value</span>: <span class="nc">P</span>::<span class="n">Target</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span>: <span class="nb">Sized</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="k">fn</span> <span class="nf">into_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">fn</span> <span class="nf">into_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span>
 
 <span class="w">  </span><span class="k">fn</span> <span class="nf">get_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">T</span>: <span class="nb">Unpin</span>
 
-  <span class="nc">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_unchecked_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"></span>
+  <span class="nc">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_unchecked_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span>
 
-<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">map_unchecked_mut</span><span class="o">&lt;</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">func</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span><span class="w"></span>
-<span class="w">    </span><span class="k">where</span><span class="w"></span>
-<span class="w">        </span><span class="n">U</span>: <span class="o">?</span><span class="nb">Sized</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="n">F</span>: <span class="nb">FnOnce</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">U</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">map_unchecked_mut</span><span class="o">&lt;</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">func</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">U</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">where</span>
+<span class="w">        </span><span class="n">U</span>: <span class="o">?</span><span class="nb">Sized</span><span class="p">,</span>
+<span class="w">        </span><span class="n">F</span>: <span class="nb">FnOnce</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">U</span>
+<span class="p">}</span>
 </pre></div>
 <p>这些方法可以分为两个大类：</p>
 <ul>
@@ -234,32 +241,32 @@
 </blockquote>
 <p>值得注意的是其实 <code>new()</code> 和 <code>new_unchecked()</code>， <code>get_mut()</code>与 <code>get_unchecked_mut()</code> ， <code>into_inner()</code> 和 <code>into_inner_unchecked()</code> 的实现是完全一样的，唯一的区别是 safe 版有 <code>Unpin</code> 限定。</p>
 <div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span>
-<span class="w">  </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="p">,</span><span class="w"></span>
-<span class="w">         </span><span class="o">&lt;</span><span class="n">P</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Deref</span><span class="o">&gt;</span>::<span class="n">Target</span>: <span class="nb">Unpin</span> <span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="p">,</span>
+<span class="w">         </span><span class="o">&lt;</span><span class="n">P</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Deref</span><span class="o">&gt;</span>::<span class="n">Target</span>: <span class="nb">Unpin</span> <span class="p">{</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new_unchecked</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pin</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">pointer</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">new_unchecked</span><span class="p">(</span><span class="n">pointer</span>: <span class="nc">P</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pin</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">pointer</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">T</span>: <span class="nb">Unpin</span> <span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">T</span>: <span class="nb">Unpin</span> <span class="p">{</span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span>
+<span class="p">}</span>
 
-<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_unchecked_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_unchecked_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">mut</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span>
+<span class="p">}</span>
 
-<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span><span class="w"></span>
-<span class="w">    </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="o">&lt;</span><span class="n">P</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Deref</span><span class="o">&gt;</span>::<span class="n">Target</span>: <span class="nb">Unpin</span> <span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">pin</span><span class="p">.</span><span class="n">pointer</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span>
+<span class="w">    </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="p">,</span>
+<span class="w">            </span><span class="o">&lt;</span><span class="n">P</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Deref</span><span class="o">&gt;</span>::<span class="n">Target</span>: <span class="nb">Unpin</span> <span class="p">{</span>
+<span class="w">    </span><span class="n">pin</span><span class="p">.</span><span class="n">pointer</span>
+<span class="p">}</span>
 
-<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner_unchecked</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">pin</span><span class="p">.</span><span class="n">pointer</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span> <span class="nf">into_inner_unchecked</span><span class="p">(</span><span class="n">pin</span>: <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">P</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">pin</span><span class="p">.</span><span class="n">pointer</span>
+<span class="p">}</span>
 </pre></div>
 <p>为什么相同的代码要区分 safe 和 unsafe 两个版本呢？要解答这个问题，还是要回到 <code>Pin</code> 的本质。<strong><code>Pin</code> 本质上解决的问题是在 safe Rust 下保证 <code>Pin&lt;P&lt;T&gt;</code> 中的 <code>T</code> 的内存地址不会被改变（也就是不被 move），除非 <code>T</code> 满足 <code>T: Unpin</code>。</strong>保证 <code>T</code> 的内存地址不会被改变的本质是避免暴露<code>T</code> 或 <code>&amp;mut T</code>（"万恶之源"）。暴露 <code>T</code> 的话，随随便便就能 move 掉它；暴露 <code>&amp;mut T</code> 的话，开发者可以调用 <code>std::mem::swap()</code> 或 <code>std::mem::replace()</code> 这类方法来 move 掉 <code>T</code>。还有一条，Rust 里面 safe 和 unsafe 的边界一定要区分非常明确，不能有任何含糊。所以只要你不满足 <code>T: Unpin</code> ，然后需要构造 <code>Pin&lt;P&lt;T&gt;&gt;</code>、暴露 <code>T</code> 或者 <code>&amp;mut T</code> 的方法都应该是 unsafe 的。</p>
 <table>
@@ -297,34 +304,34 @@
 <blockquote><p>类似的，<code>Pin&lt;&amp;mut Box&lt;T&gt;&gt;</code> 保证的是 <code>Box&lt;T&gt;</code> 本身不被 move，而不是 <code>Box</code> 里面的 <code>T</code>。如果要保证 <code>Box&lt;T&gt;</code> 里面的 <code>T</code> 不被 move，直接使用 <code>Pin&lt;Box&lt;T&gt;&gt;</code> 即可。</p>
 </blockquote>
 <h2 id="pin-e-wai-de-shu-xing">Pin 额外的属性</h2><h3 id="fundamental">#[fundamental]</h3><p>使用<code>#[fundamental]</code>属性标记的 trait 是不受孤儿规则约束。所以你可以给 <code>Pin&lt;P&lt;T&gt;&gt;</code> impl 你本地的 trait。</p>
-<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">pin</span>::<span class="n">Pin</span><span class="p">;</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">pin</span>::<span class="n">Pin</span><span class="p">;</span>
 
-<span class="k">trait</span><span class="w"> </span><span class="n">LocalTrait</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="k">trait</span><span class="w"> </span><span class="n">LocalTrait</span><span class="w"> </span><span class="p">{}</span>
 
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="n">LocalTrait</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="n">LocalTrait</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="p">}</span>
 </pre></div>
 <h3 id="repr-transparent">#[repr(transparent)]</h3><p><code>#[repr(transparent)]</code> 这个属性可以让 <code>Pin</code> 拥有和里面 <code>pointer</code> 字段同样的 ABI 布局，在 FFI 的场景下会很有用。</p>
 <blockquote><p><code>#[repr(transparent)]</code> 是 1.28 稳定的，详细可以看 <a href="https://github.com/rust-lang/rust/blob/master/RELEASES.md#version-1280-2018-08-02">release note</a>：</p>
 <p><a href="https://github.com/rust-lang/rust/pull/51562/">The <code>#[repr(transparent)]</code> attribute is now stable.</a> This attribute allows a Rust newtype wrapper (<code>struct NewType&lt;T&gt;(T);</code>) to be represented as the inner type across Foreign Function Interface (FFI) boundaries.</p>
 </blockquote>
 <h2 id="pin-shi-xian-de-trait">Pin 实现的 trait</h2><p>再来看看 <code>Pin</code> 实现了哪些值得关注的 trait。</p>
-<h3 id="unpin">Unpin</h3><div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="nb">Unpin</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nb">Unpin</span> <span class="p">{}</span><span class="w"></span>
+<h3 id="unpin">Unpin</h3><div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="nb">Unpin</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nb">Unpin</span> <span class="p">{}</span>
 </pre></div>
 <p>因为 <code>Unpin</code> 是 auto trait，所以 <code>Pin&lt;P&lt;T&gt;</code> 如果满足 <code>P: Unpin</code> ，则 <code>Pin&lt;P&lt;T&gt;&gt;</code> 也会实现 <code>Unpin</code>。而几乎所有 <code>P</code> 都会是 <code>Unpin</code> ，所以 <code>Pin&lt;P&lt;T&gt;&gt;</code> 几乎总会是 <code>Unpin</code> 的。这个实现很重要，特别是如果这里的 <code>T</code> 是 <code>Future</code> 的时候。不管你的 <code>Future</code> 是不是满足 <code>Unpin</code>，把你用 <code>Pin&lt;&amp;mut ...&gt;</code> 包裹之后，它就是一个满足 <code>Unpin</code> 的 <code>Future</code> 了（因为 <code>Pin&lt;P&gt;</code> 实现了 <code>Future</code>，后面会讲到）。很多异步的方法可能需要你的 <code>Future</code> 满足 <code>Unpin</code> 才能调用，而 <code>async fn</code> 方法返回的 <code>Future</code> 显然不满足 <code>Unpin</code>，这个时候往往需要你把这个 <code>Future</code> pin 住才行。比如使用 <a href="https://docs.rs/tokio/latest/tokio/macro.pin.html">tokio::pin!()</a> 这个宏。</p>
-<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">tokio</span>::<span class="n">pin</span><span class="p">;</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">tokio</span>::<span class="n">pin</span><span class="p">;</span>
 
-<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">my_async_fn</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">my_async_fn</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// async logic here</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 
-<span class="cp">#[tokio::main]</span><span class="w"></span>
-<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_async_fn</span><span class="p">();</span><span class="w"></span>
-<span class="w">    </span><span class="n">pin</span><span class="o">!</span><span class="p">(</span><span class="n">future</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#[tokio::main]</span>
+<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_async_fn</span><span class="p">();</span>
+<span class="w">    </span><span class="n">pin</span><span class="o">!</span><span class="p">(</span><span class="n">future</span><span class="p">);</span>
 
-<span class="w">    </span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">future</span><span class="p">).</span><span class="k">await</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">future</span><span class="p">).</span><span class="k">await</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 <p>另外，需要再次强调的是：</p>
 <ul>
@@ -332,105 +339,105 @@
 <li><strong><code>Pin</code> 能不能把 <code>T</code>  pin 住跟 <code>P</code> 是不是 <code>Unpin</code> 没有任何关系，只跟 <code>T</code> 有关系。</strong></li>
 </ul>
 <p>上面两句话虽然有点绕，但是搞清楚了后，很多 Pin 的场景就不会懵逼了。</p>
-<h3 id="deref-he-derefmut">Deref 和 DerefMut</h3><div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">Deref</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Deref</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span> <span class="nc">Target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">P</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pin</span>::<span class="n">get_ref</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">as_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<h3 id="deref-he-derefmut">Deref 和 DerefMut</h3><div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">Deref</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Deref</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="p">;</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">P</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pin</span>::<span class="n">get_ref</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">as_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">DerefMut</span><span class="o">&lt;</span><span class="n">Target</span>: <span class="nb">Unpin</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">DerefMut</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">deref_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pin</span>::<span class="n">get_mut</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">as_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">P</span>: <span class="nc">DerefMut</span><span class="o">&lt;</span><span class="n">Target</span>: <span class="nb">Unpin</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">DerefMut</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">deref_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">P</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pin</span>::<span class="n">get_mut</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">as_mut</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>这两个 trait 对 <code>Pin</code> 非常关键。只有实现了 <code>Deref</code> 后 <code>Pin&lt;P&gt;</code> 才是智能指针，开发者才可以无缝的调用 <code>P</code> 的方法。值得注意的是，只有满足 <code>T: Unpin</code> ，才会给 <code>Pin&lt;P&lt;T&gt;&gt;</code> 实现 <code>DerefMut</code>。因为 Safe Rust 下，<code>Pin&lt;P&lt;T&gt;&gt;</code> 的职责之一就是不能在不满足 <code>T: Unpin</code> 的前提条件下暴露 <code>&amp;mut T</code>。</p>
 <p>另外，实现了这两个 trait 之后，分别可以解引用拿到 <code>&amp;T</code> 和 <code>&amp;mut T</code>，但这种解引用的方式和 <code>get_ref()</code>、<code>get_mut()</code> 是有区别的。以 <code>&amp;T</code> 为例，假设有 <code>let p = Pin::new(&amp;T);</code>, 解引用 <code>p</code> 拿到 <code>&amp;T</code>： <code>let t = &amp;*p</code>;，这里拿到的 <code>&amp;T</code> 的生命周期其实等于 <code>&amp;Pin::new(&amp;T)</code> 的生命周期。而 <code>Pin::new(&amp;T).get_ref()</code> 拿到的 <code>&amp;T</code> 的生命周期和 <code>Pin</code> 自身的生命周期是相等的。</p>
 <p>为什么会这样呢？我们把解引用智能指针的语法糖展开之后看看。</p>
-<div class="hll"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="n">T</span><span class="p">);</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="n">T</span><span class="p">);</span>
 <span class="c1">// let t = &amp;*p; 展开语法糖之后如下：</span>
-<span class="kd">let</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;*</span><span class="n">Deref</span>::<span class="n">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">);</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;*</span><span class="n">Deref</span>::<span class="n">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
 </pre></div>
 <p><code>Pin</code> 的 <code>Deref</code> 实现代码是：<code>Pin::get_ref(Pin::as_ref(self))</code>，而 <code>Pin::as_ref()</code> 的代码如下。通过对比，就能发现解引用拿到的 <code>&amp;T</code> 的生命周期确实和 <code>get_ref()</code> 拿到的是不一样的。</p>
-<div class="hll"><pre><span></span><span class="k">impl</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">as_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="o">&amp;*</span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">impl</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">P</span>: <span class="nc">Deref</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">fn</span> <span class="nf">as_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="n">P</span>::<span class="n">Target</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="o">&amp;*</span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
 <span class="c1">// 对比上面 Deref 的实现</span>
-<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">T</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;&#39;</span><span class="na">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span>: <span class="o">?</span><span class="nb">Sized</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Pin</span><span class="o">&lt;&amp;&#39;</span><span class="na">a</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">fn</span> <span class="nf">get_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="o">&#39;</span><span class="na">a</span> <span class="nc">T</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">pointer</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>另外一个值得注意的地方是 <code>Pin::as_ref()</code> 和 <code>Pin::as_mut()</code> 里面会解引用 <code>self.pointer</code>，其实就是会调用它的 <code>deref()</code> 或 <code>deref_mut()</code> 方法。这两个方法是由 <code>P</code> 自己实现的，所以这里会存在“恶意实现”把 <code>T</code> move 掉的可能性。但是这种“恶意实现”会被 <strong>Pin 的契约</strong> 排除掉：这是你自己“恶意实现”导致的，并不是由于使用 <code>Pin</code> 导致。</p>
 <blockquote><p>Pin::new_unchecked() 的文档特意强调到了这一点：</p>
 <p>By using this method, you are making a promise about the <code>P::Deref</code> and <code>P::DerefMut</code> implementations, if they exist. Most importantly, they must not move out of their <code>self</code> arguments: <code>Pin::as_mut</code> and <code>Pin::as_ref</code> will call <code>DerefMut::deref_mut</code> and <code>Deref::deref</code> <em>on the pinned pointer</em> and expect these methods to uphold the pinning invariants.</p>
 </blockquote>
-<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">pin</span>::<span class="n">Pin</span><span class="p">;</span><span class="w"></span>
-<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">marker</span>::<span class="n">PhantomPinned</span><span class="p">;</span><span class="w"></span>
-<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ptr</span>::<span class="n">NonNull</span><span class="p">;</span><span class="w"></span>
-<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ops</span>::<span class="p">{</span><span class="n">Deref</span><span class="p">,</span><span class="w"> </span><span class="n">DerefMut</span><span class="p">};</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">pin</span>::<span class="n">Pin</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">marker</span>::<span class="n">PhantomPinned</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ptr</span>::<span class="n">NonNull</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">ops</span>::<span class="p">{</span><span class="n">Deref</span><span class="p">,</span><span class="w"> </span><span class="n">DerefMut</span><span class="p">};</span>
 
-<span class="k">struct</span> <span class="nc">Unmovable</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">data</span>: <span class="nb">String</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">slice</span>: <span class="nc">NonNull</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">struct</span> <span class="nc">Unmovable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">data</span>: <span class="nb">String</span><span class="p">,</span>
+<span class="w">    </span><span class="n">slice</span>: <span class="nc">NonNull</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">data</span>: <span class="nb">String</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">Boz</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="n">data</span><span class="p">,</span><span class="w"></span>
-<span class="w">            </span><span class="n">slice</span>: <span class="nc">NonNull</span>::<span class="n">dangling</span><span class="p">(),</span><span class="w"></span>
-<span class="w">            </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="p">};</span><span class="w"></span>
-<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">bozed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="n">Boz</span><span class="p">(</span><span class="n">res</span><span class="p">))</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="k">impl</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">data</span>: <span class="nb">String</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Pin</span><span class="o">&lt;</span><span class="n">Boz</span><span class="o">&lt;</span><span class="bp">Self</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">data</span><span class="p">,</span>
+<span class="w">            </span><span class="n">slice</span>: <span class="nc">NonNull</span>::<span class="n">dangling</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span>
+<span class="w">        </span><span class="p">};</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">bozed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">new_unchecked</span><span class="p">(</span><span class="n">Boz</span><span class="p">(</span><span class="n">res</span><span class="p">))</span><span class="w"> </span><span class="p">};</span>
 
-<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NonNull</span>::<span class="n">from</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bozed</span><span class="p">.</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NonNull</span>::<span class="n">from</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bozed</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
 <span class="w">        </span><span class="c1">// we know this is safe because modifying a field doesn&#39;t move the whole struct</span>
-<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">mut_ref</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">as_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">bozed</span><span class="p">);</span><span class="w"></span>
-<span class="w">            </span><span class="n">Pin</span>::<span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">mut_ref</span><span class="p">).</span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slice</span><span class="p">;</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">        </span><span class="n">bozed</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">mut_ref</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pin</span>::<span class="n">as_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">bozed</span><span class="p">);</span>
+<span class="w">            </span><span class="n">Pin</span>::<span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">mut_ref</span><span class="p">).</span><span class="n">slice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">slice</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">bozed</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">impl</span><span class="w"> </span><span class="nb">Default</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">default</span><span class="p">()</span><span class="w"> </span>-&gt; <span class="nc">Self</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="n">data</span>: <span class="nb">String</span>::<span class="n">new</span><span class="p">(),</span><span class="w"></span>
-<span class="w">            </span><span class="n">slice</span>: <span class="nc">NonNull</span>::<span class="n">dangling</span><span class="p">(),</span><span class="w"></span>
-<span class="w">            </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="w"> </span><span class="nb">Default</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">default</span><span class="p">()</span><span class="w"> </span>-&gt; <span class="nc">Self</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Unmovable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">data</span>: <span class="nb">String</span>::<span class="n">new</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">slice</span>: <span class="nc">NonNull</span>::<span class="n">dangling</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">_pin</span>: <span class="nc">PhantomPinned</span><span class="p">,</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">struct</span> <span class="nc">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">T</span><span class="p">);</span><span class="w"></span>
+<span class="k">struct</span> <span class="nc">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">T</span><span class="p">);</span>
 
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Deref</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span> <span class="nc">Target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">Self</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Deref</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="p">;</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">deref</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">Self</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
 <span class="c1">// “Malicious” implementations of DerefMut</span>
-<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nb">Default</span><span class="o">&gt;</span><span class="w"> </span><span class="n">DerefMut</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">deref_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="bp">Self</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span>::<span class="n">mem</span>::<span class="n">take</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">impl</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nb">Default</span><span class="o">&gt;</span><span class="w"> </span><span class="n">DerefMut</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Boz</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">deref_mut</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="bp">Self</span>::<span class="n">Target</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span>::<span class="n">mem</span>::<span class="n">take</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
-<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">   </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">unmovable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Unmovable</span>::<span class="n">new</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&quot;Malicious!!!&quot;</span><span class="p">));</span><span class="w"></span>
-<span class="w">   </span><span class="n">unmovable</span><span class="p">.</span><span class="n">as_mut</span><span class="p">();</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">unmovable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Unmovable</span>::<span class="n">new</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&quot;Malicious!!!&quot;</span><span class="p">));</span>
+<span class="w">   </span><span class="n">unmovable</span><span class="p">.</span><span class="n">as_mut</span><span class="p">();</span>
+<span class="p">}</span>
 </pre></div>
 <p>上面的例子，我们构造了一个 <code>Pin&lt;Boz&lt;Unmovable&gt;&gt;</code>，然后调用 <code>as_mut()</code> 方法的时候会解引用这个 <code>Boz</code>，<code>Boz</code> 有一个“恶意”的 <code>DerefMut</code> 实现，里面会 move 掉这个 <code>Unmovable</code>。但明明我是是把它 <code>Pin</code> 住了的。</p>
 <h3 id="future">Future</h3><p><code>Pin</code> 还实现了 <code>Future</code>， 这个和 <code>Unpin</code> 关系密切，我们在接下来的部分统一讲解。</p>
@@ -448,47 +455,47 @@
 </blockquote>
 <h3 id="unpin-shi-safe-trait">Unpin 是 safe trait</h3><p>另外一个很重要的特点：<strong><code>Unpin</code> 是一个 safe trait。</strong>也就是说你可以在 safe Rust 下给任意类型实现 <code>Unpin</code>，包括你的 <code>Future</code> 类型。</p>
 <blockquote><p>我们提前准备好两个 assert 函数，后面会用到：</p>
-<div class="hll"><pre><span></span><span class="k">fn</span> <span class="nf">assert_future</span><span class="o">&lt;</span><span class="n">F</span>: <span class="nc">Future</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_f</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
-<span class="k">fn</span> <span class="nf">assert_unpin</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nb">Unpin</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_t</span>: <span class="nc">T</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">fn</span> <span class="nf">assert_future</span><span class="o">&lt;</span><span class="n">F</span>: <span class="nc">Future</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_f</span>: <span class="nc">F</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="k">fn</span> <span class="nf">assert_unpin</span><span class="o">&lt;</span><span class="n">T</span>: <span class="nb">Unpin</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_t</span>: <span class="nc">T</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
 </pre></div>
 </blockquote>
-<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">future</span>::<span class="n">Future</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">pin</span>::<span class="n">Pin</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">task</span>::<span class="p">{</span><span class="n">Context</span><span class="p">,</span><span class="w"> </span><span class="n">Poll</span><span class="p">},</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="p">{</span>
+<span class="w">    </span><span class="n">future</span>::<span class="n">Future</span><span class="p">,</span>
+<span class="w">    </span><span class="n">pin</span>::<span class="n">Pin</span><span class="p">,</span>
+<span class="w">    </span><span class="n">task</span>::<span class="p">{</span><span class="n">Context</span><span class="p">,</span><span class="w"> </span><span class="n">Poll</span><span class="p">},</span>
+<span class="p">};</span>
 
-<span class="cp">#[derive(Clone)]</span><span class="w"></span>
-<span class="k">struct</span> <span class="nc">Dummy</span><span class="p">(</span><span class="nb">String</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#[derive(Clone)]</span>
+<span class="k">struct</span> <span class="nc">Dummy</span><span class="p">(</span><span class="nb">String</span><span class="p">);</span>
 
-<span class="k">impl</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Dummy</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">();</span><span class="w"></span>
+<span class="k">impl</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Dummy</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">();</span>
 
-<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">_cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="w">        </span><span class="n">Poll</span>::<span class="n">Ready</span><span class="p">(())</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">_cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Poll</span>::<span class="n">Ready</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 
 <span class="c1">// 不加这一行，编译器也会帮你自动实现 Unpin</span>
-<span class="k">impl</span><span class="w"> </span><span class="nb">Unpin</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Dummy</span><span class="w"> </span><span class="p">{}</span><span class="w"></span>
+<span class="k">impl</span><span class="w"> </span><span class="nb">Unpin</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Dummy</span><span class="w"> </span><span class="p">{}</span>
 
-<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">dummy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dummy</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&quot;hello world!&quot;</span><span class="p">));</span><span class="w"></span>
-<span class="w">    </span><span class="n">assert_future</span><span class="p">(</span><span class="n">dummy</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span><span class="w"></span>
-<span class="w">    </span><span class="n">assert_unpin</span><span class="p">(</span><span class="n">dummy</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">dummy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dummy</span><span class="p">(</span><span class="nb">String</span>::<span class="n">from</span><span class="p">(</span><span class="s">&quot;hello world!&quot;</span><span class="p">));</span>
+<span class="w">    </span><span class="n">assert_future</span><span class="p">(</span><span class="n">dummy</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">    </span><span class="n">assert_unpin</span><span class="p">(</span><span class="n">dummy</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 <p>如果你要在另外一个 <code>Future</code> 中去 poll 这个 <code>Dummy</code> future 也是完全没有问题的。<code>futures</code> crate 甚至还提供了一系列 <a href="https://docs.rs/futures/latest/futures/index.html?search=unpin">unpin 版的方法</a>来帮助你做这件事，比如 <a href="https://docs.rs/futures/latest/futures/future/trait.FutureExt.html#method.poll_unpin">FutureExt::poll_unpin()</a> 。</p>
-<div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">FutureExt</span>: <span class="nc">Future</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">FutureExt</span>: <span class="nc">Future</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="sd">/// A convenience for calling `Future::poll` on `Unpin` future types.</span>
-<span class="w">    </span><span class="k">fn</span> <span class="nf">poll_unpin</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"></span>
-<span class="w">    </span><span class="k">where</span><span class="w"></span>
-<span class="w">        </span><span class="bp">Self</span>: <span class="nb">Unpin</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="p">).</span><span class="n">poll</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">poll_unpin</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span>
+<span class="w">    </span><span class="k">where</span>
+<span class="w">        </span><span class="bp">Self</span>: <span class="nb">Unpin</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="p">).</span><span class="n">poll</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>可以看到这里是 <code>&amp;mut self</code>，而不是 <code>self: Pin&lt;&amp;mut Self&gt;</code>。</p>
 <p>但是，pin projection 场景下需要特别注意，如果你的类型中有字段是 <code>!Unpin</code> 的，你就不能给这个类型实现 <code>Unpin</code>。具体可以看官网 <a href="https://doc.rust-lang.org/std/pin/index.html#pinning-is-structural-for-field">Pinning <em>is</em> structural for field</a> 。</p>
@@ -496,16 +503,16 @@
 <h3 id="pin-de-future-shi-xian">Pin 的 Future 实现</h3><p>之所以移到这里来讲 <code>Pin</code> 的 <code>Future</code> 实现，是因为 <strong>1.56</strong> 有一个 PR <a href="https://github.com/rust-lang/rust/pull/81363">#81363</a>  把 <code>P: Unpin</code> 的限定去掉了。我们先来看一下为什么要给 <code>Pin</code> 实现 <code>Future</code>，然后再来分析为什么这里的 <code>Unpin</code>  限定可以放开。</p>
 <div class="hll"><pre><span></span><span class="w">impl&lt;P&gt; Future for Pin&lt;P&gt;</span>
 <span class="w">where</span>
-<span class="gd">-   P: Unpin + ops::DerefMut&lt;Target: Future&gt;,</span><span class="w"></span>
-<span class="gi">+   P: ops::DerefMut&lt;Target: Future&gt;,</span><span class="w"></span>
+<span class="gd">-   P: Unpin + ops::DerefMut&lt;Target: Future&gt;,</span>
+<span class="gi">+   P: ops::DerefMut&lt;Target: Future&gt;,</span>
 <span class="w">{</span>
-<span class="w"> </span>   type Output = &lt;&lt;P as ops::Deref&gt;::Target as Future&gt;::Output;<span class="w"></span>
+<span class="w"> </span>   type Output = &lt;&lt;P as ops::Deref&gt;::Target as Future&gt;::Output;
 
-<span class="w"> </span>   fn poll(self: Pin&lt;&amp;mut Self&gt;, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Self::Output&gt; {<span class="w"></span>
-<span class="gd">-       Pin::get_mut(self).as_mut().poll(cx)</span><span class="w"></span>
-<span class="gi">+       &lt;P::Target as Future&gt;::poll(self.as_deref_mut(), cx)</span><span class="w"></span>
-<span class="w"> </span>       // self.as_deref_mut() 其实就是 unsafe { self.get_unchecked_mut() }.as_mut()<span class="w"></span>
-<span class="w"> </span>   }<span class="w"></span>
+<span class="w"> </span>   fn poll(self: Pin&lt;&amp;mut Self&gt;, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Self::Output&gt; {
+<span class="gd">-       Pin::get_mut(self).as_mut().poll(cx)</span>
+<span class="gi">+       &lt;P::Target as Future&gt;::poll(self.as_deref_mut(), cx)</span>
+<span class="w"> </span>       // self.as_deref_mut() 其实就是 unsafe { self.get_unchecked_mut() }.as_mut()
+<span class="w"> </span>   }
 <span class="w">}</span>
 </pre></div>
 <p>给 <code>Pin</code> 实现 <code>Future</code> 的理由很简单，就是为了方便调用 <code>poll()</code>，特别是在 pin projection 的场景。因为 <code>poll()</code> 的 <code>self</code> 是 <code>Pin&lt;&amp;mut Self&gt;</code> 类型，你没办法直接用 <code>future</code> 来调用 <code>poll()</code>。</p>
@@ -532,44 +539,44 @@
 <p>其次，tower 也在考虑要不要加 <code>Pin&lt;&amp;mut Self&gt;</code>：<a href="https://github.com/tower-rs/tower/issues/319">Pinning and Service</a>.</p>
 </blockquote>
 <p>关于第 (1) 类，主要原因是给 <code>&amp;mut Future</code> 实现 <code>Future</code> 的时候指定需要了 <code>F: Unpin</code>。</p>
-<div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">F</span>: <span class="o">?</span><span class="nb">Sized</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Unpin</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">F</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span>::<span class="n">Output</span><span class="p">;</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">F</span>: <span class="o">?</span><span class="nb">Sized</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Unpin</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">F</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span>::<span class="n">Output</span><span class="p">;</span>
 
-<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">F</span>::<span class="n">poll</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="o">**</span><span class="bp">self</span><span class="p">),</span><span class="w"> </span><span class="n">cx</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">F</span>::<span class="n">poll</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="o">**</span><span class="bp">self</span><span class="p">),</span><span class="w"> </span><span class="n">cx</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>所以归根结底需要搞清楚为什么这里需要 <code>Unpin</code>。先从场景谈起，假如我们有一个 <code>future</code> 需要在 <code>loop</code> 中不断地 poll 它，但是 <code>Future::poll()</code> 每调用一次就会消耗掉 <code>self</code> 的所有权。因此我们需要可变借用这个 <code>future</code>，避免消耗掉 <code>future</code> 的所有权。但是 <code>&amp;mut future</code> 之后会存在 move 掉这个 <code>future</code> 的风险（“万恶之源”），所以要么你这个 <code>future</code> 是 <code>Unpin</code> 的，要么你就要把它 pin 住再可变借用它（也就是 <code>&amp;mut Pin&lt;&amp;mut future&gt;</code>）。而刚好  <code>Pin&lt;P&gt;
 where P: DerefMut</code> 实现了 <code>Future</code>！（前面部分刚讲过的）而且 <code>Pin&lt;P&gt;</code> 也是满足 <code>Unpin</code> 的！真的太完美了，我们干脆给 <code>&amp;mut F</code> 实现 <code>Future</code> 吧，只要 <code>F</code> 满足 <code>Future + Unpin</code> 就行。这样的好处是如果你的 <code>future</code> 满足 <code>Unpin</code>，那你直接 <code>loop</code> 中多次 poll 就行，不用担心 move 的问题；如果你的 <code>future</code> 不满足 <code>Unpin</code>，那也没关系，把它 pin 住就好了。比如下面的例子，因为 <a href="https://docs.rs/tokio/latest/tokio/time/struct.Sleep.html">tokio::time::Sleep</a> 不满足 <code>Unpin</code>，你需要先使用 <code>tokio::pin!()</code> 把它 pin 住才可以编译通过。</p>
-<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">tokio</span>::<span class="n">time</span>::<span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">,</span><span class="w"> </span><span class="n">Instant</span><span class="p">};</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">tokio</span>::<span class="n">time</span>::<span class="p">{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">,</span><span class="w"> </span><span class="n">Instant</span><span class="p">};</span>
 
-<span class="cp">#[tokio::main]</span><span class="w"></span>
-<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">sleep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span>::<span class="n">sleep</span><span class="p">(</span><span class="n">Duration</span>::<span class="n">from_millis</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span><span class="w"></span>
-<span class="w">    </span><span class="n">tokio</span>::<span class="n">pin</span><span class="o">!</span><span class="p">(</span><span class="n">sleep</span><span class="p">);</span><span class="w"></span>
+<span class="cp">#[tokio::main]</span>
+<span class="k">async</span><span class="w"> </span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">sleep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">time</span>::<span class="n">sleep</span><span class="p">(</span><span class="n">Duration</span>::<span class="n">from_millis</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span>
+<span class="w">    </span><span class="n">tokio</span>::<span class="n">pin</span><span class="o">!</span><span class="p">(</span><span class="n">sleep</span><span class="p">);</span>
 
-<span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">tokio</span>::<span class="n">select</span><span class="o">!</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">            </span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">sleep</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;timer elapsed&quot;</span><span class="p">);</span><span class="w"></span>
-<span class="w">                </span><span class="n">sleep</span><span class="p">.</span><span class="n">as_mut</span><span class="p">().</span><span class="n">reset</span><span class="p">(</span><span class="n">Instant</span>::<span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Duration</span>::<span class="n">from_millis</span><span class="p">(</span><span class="mi">50</span><span class="p">));</span><span class="w"></span>
-<span class="w">            </span><span class="p">},</span><span class="w"></span>
-<span class="w">        </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">tokio</span>::<span class="n">select</span><span class="o">!</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">sleep</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;timer elapsed&quot;</span><span class="p">);</span>
+<span class="w">                </span><span class="n">sleep</span><span class="p">.</span><span class="n">as_mut</span><span class="p">().</span><span class="n">reset</span><span class="p">(</span><span class="n">Instant</span>::<span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Duration</span>::<span class="n">from_millis</span><span class="p">(</span><span class="mi">50</span><span class="p">));</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>另外，同样的道理，给 <code>Box&lt;F&gt;</code> 实现 <code>Future</code> 的时候也需要 <code>Unpin</code>。</p>
-<div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">F</span>: <span class="o">?</span><span class="nb">Sized</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Unpin</span><span class="p">,</span><span class="w"> </span><span class="n">A</span>: <span class="nc">Allocator</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">&gt;</span><span class="w"></span>
-<span class="k">where</span><span class="w"></span>
-<span class="w">    </span><span class="n">A</span>: <span class="o">&#39;</span><span class="nb">static</span><span class="p">,</span><span class="w"></span>
-<span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span>::<span class="n">Output</span><span class="p">;</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">impl</span><span class="o">&lt;</span><span class="n">F</span>: <span class="o">?</span><span class="nb">Sized</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Unpin</span><span class="p">,</span><span class="w"> </span><span class="n">A</span>: <span class="nc">Allocator</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Future</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">&gt;</span>
+<span class="k">where</span>
+<span class="w">    </span><span class="n">A</span>: <span class="o">&#39;</span><span class="nb">static</span><span class="p">,</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">type</span> <span class="nc">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span>::<span class="n">Output</span><span class="p">;</span>
 
-<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="n">F</span>::<span class="n">poll</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="o">*</span><span class="bp">self</span><span class="p">),</span><span class="w"> </span><span class="n">cx</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">fn</span> <span class="nf">poll</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span>: <span class="nc">Pin</span><span class="o">&lt;&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">Self</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">cx</span>: <span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="o">&lt;&#39;</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span>-&gt; <span class="nc">Poll</span><span class="o">&lt;</span><span class="bp">Self</span>::<span class="n">Output</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">F</span>::<span class="n">poll</span><span class="p">(</span><span class="n">Pin</span>::<span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="o">*</span><span class="bp">self</span><span class="p">),</span><span class="w"> </span><span class="n">cx</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <h2 id="qi-ta-xu-yao-pin-de-chang-jing">其他需要 Pin 的场景</h2><p>经常碰到有人问类似"我这个场景是不是需要用 <code>Pin</code> 来解决？"的问题，我看了一下，根本跟 <code>Pin</code> 没有任何关系，于是会用这句经典名言回复他：</p>
 <blockquote><p>Rust 社区经典名言：<strong>Whenever you wonder if Pin could be the solution, it isn't.</strong></p>
@@ -578,28 +585,28 @@ where P: DerefMut</code> 实现了 <code>Future</code>！（前面部分刚讲�
 <h3 id="intrusive-collections">Intrusive collections</h3><p><strong>Intrusive collections</strong>（侵入式集合） 是 <code>Pin</code> 的另外一个应用场景。 <code>Pin</code> 的文档上有提到 <strong>intrusive doubly-linked list</strong> （侵入式双链表）这个例子，但是对于其他侵入式数据结构也类似（比如侵入式单链表）。不过文档只有言简意赅的几句话，并不是很好理解，我在这里简单的总结一下。</p>
 <p>首先需要了解 <strong>instrusive collections</strong> 是什么。我们平时用到的集合数据结构几乎都是 <strong>non-intrusive</strong> 的，比如标准库的 <code>Vec</code>，<code>LinkedList</code> 等。<strong>non-intrusive</strong> 类型集合的特点是集合中的元素和集合自身是完全解耦的，集合不需要关心每一个元素的类型是什么，集合也可以用来存放任意类型的元素。但 <strong>intrusive</strong> 类型的集合是一种完全侵入式的集合，它的 <code>prev</code> 或 <code>next</code> 指针是定义在元素上面的。</p>
 <p>以 C++ 为例子 ，<strong>non-intrusive</strong> 的双链表可以这样定义：</p>
-<div class="hll"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
 
-<span class="k">struct</span><span class="w"> </span><span class="nc">ListNode</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">Point</span><span class="w"> </span><span class="n">val</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">ListNode</span><span class="w"> </span><span class="o">*</span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">prev</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">ListNode</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Point</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ListNode</span><span class="w"> </span><span class="o">*</span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 <p>而 <strong>intrusive</strong> 的版本需要这样写：</p>
-<div class="hll"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">Point</span><span class="w"> </span><span class="o">*</span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">prev</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Point</span><span class="w"> </span><span class="o">*</span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">prev</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 <p>Rust 版 <strong>intrusive</strong> 的伪代码大概也是这样：</p>
-<div class="hll"><pre><span></span><span class="k">struct</span> <span class="nc">Point</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">x</span>: <span class="kt">f64</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">y</span>: <span class="kt">f64</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">prev</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">Rc</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="n">next</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">Rc</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="hll"><pre><span></span><span class="k">struct</span> <span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">x</span>: <span class="kt">f64</span><span class="p">,</span>
+<span class="w">    </span><span class="n">y</span>: <span class="kt">f64</span><span class="p">,</span>
+<span class="w">    </span><span class="n">prev</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">Rc</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">next</span>: <span class="nb">Option</span><span class="o">&lt;</span><span class="n">Rc</span><span class="o">&lt;</span><span class="n">Point</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="p">}</span>
 </pre></div>
 <p>可以看到两者最大的区别在于指针是放在集合上面还是放在元素上面。两种类型的集合各自有优缺点，而 <strong>intrusive</strong> 类型最大的优点在于性能更好，缺点也很明显，不通用，不同的元素需要重复定义集合。相关的知识不是本文的重点，更多详细信息可以看看下面的资料：</p>
 <blockquote><ul>
