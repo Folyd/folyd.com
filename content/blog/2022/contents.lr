@@ -1,0 +1,85 @@
+title: 我的 2022 总结
+---
+pub_date: 2023-01-05
+---
+author: Folyd
+---
+body:
+
+从来没有写过年终总结，今年尝试总结一下，主要希望自己多年以后再来回顾能有新的感触和收获。废话不多说，开始：
+
+## 回顾
+
+### To-D 观察室
+
+2021 年 12 月 23 号开始在字节内部搞了一个叫《To-D 观察室》的专栏 (对外版: [https://2d2d.io/](https://2d2d.io/))，主要是分享 To-D 开发者行业相关的动态和故事，可能有点类似于开发者版的《浪潮之巅》。大概四个月时间里，我总共发布了两季，写了 12 篇文章，后来因为 4 月份有其他事情，所以就停更了。可一旦停更了，要想继续更新真的就没那么容易了。因为要写这些文章实在需要花太多时间，我想把这些时间用来做一些其他事情。不过我对 To-D 行业的关注依然没有中断，于是我搞了一个同名的 《To-D 观察室》飞书群和 [Telegram 频道](https://t.me/tod_magazine)，不定期在里面分享我了解到的最新行业动态，每一篇都比较短，我只需要在几句话之类把某个动态的重点讲清楚就行，不需要花太多时间，所以这件事我一直坚持下来了。截止到 2022 年底，《To-D 观察室》的飞书群有 639 人，Telegram 上有 737 个订阅，个人感觉还是很不错的，特别是飞书群里面还有好多字节内部的大佬加入，其实还挺有压力的。
+
+我很希望《To-D 观察室》可以一直帮助到关注这个领域的人，但更重要的是他对我个人也很有帮助，一方面丰富了自己的行业知识和阅历，也锻炼了自己归纳分析、总结重点的能力，另一方面，好记性不如烂笔头，我总结的这些也是为了方便我以后检索。一举多得，何乐而不为呢！
+
+2023 年我会一如既往保持更新的！
+
+### Zine
+
+写这个《To-D 观察室》专栏的时候确实没有想到这件无心插柳的事情能得到了字节内部很多人的喜欢，所以让我萌发了一个把他对外发布出去的想法。不过我是一个早期互联网去中心化、开放理念的忠实拥趸，所以我从来没有考虑过要把我的这些文章发布到微信公众号或者知乎专栏这样的平台，就算这些平台可以更方便获取流量甚至投放广告变现。因为最初我搞《To-D 观察室》就是按 10 篇文章为一季的方式发布的，这种比较类似杂志，因此我决定依然以杂志的方式对外发布。简单调研过社区上的项目，我发现并没有一个专门针对杂志的静态网站生成器，于是我决定用 Rust 自己写一个，名字就叫 [zine]。
+
+[zine] 发布没多久很快就上了 GitHub Rust trending 榜，没过多久又被国外的人发到 HackerNews 上了，并且还[上了](https://news.ycombinator.com/item?id=30966362) HackerNews 热榜，当时 star 数涨得飞快！想起我以前提交过好几次 HackerNews 都是石沉大海，没想到别人帮我提交反而上了热榜。
+
+![](https://api.star-history.com/svg?repos=zineland/zine&type=Date)
+
+从 2 月 25 号开始写第一行代码，到 3 月 20 号发布第一个版本，过去一年 zine 总共发布了 9 个版本。Star 数超过 760，fork 数 30，但下载量只有 1.3k，属于是一个非常小众的产品了。不过不管多少人下载，我都会一直更新下去的。毕竟 2022 年我用 zine 搞了至少 5 份杂志，我从小就喜欢看杂志，我也很喜欢杂志这种出版物，所以开发 zine 永远会让我乐在其中。
+
+- [2d2d.io](https://2d2d.io) -《To-D 杂志》，这也是我用 [zine] 创建的第一份杂志。
+- [o11y.cn](https://o11y.cn) -《O11Y 杂志》，本来想搞一份专注于可观测性(Observability)领域的技术杂志，但是精力有限没搞了。
+- [现代诗杂志](https://poetries.netlify.app) - 搞着玩的现代诗杂志。
+- [The Whitepaper](https://thewhitepaper.github.io) - “白纸运动”当天马上搞出来的白纸杂志，现在这个杂志每天都会有一个叫 [Paranoic](https://thewhitepaper.github.io/@paranoic/) 的机器人提交一篇白纸文章，只要 Github 没有倒闭，他就会永远更新下去。
+
+> Paranoic 是痴心妄想者的意思，也意味着所谓的言论自由并不知道会不会实现，也不知道什么时候会实现。
+
+- [Rust Magazine](https://rustmagazine.github.io) - 这是我 12 月份搞的 Rust 英文杂志，其实很早就想搞了，但是对自己的英文写作能力还很担忧，没想到 11 月底 ChatGPT 的出现马上就提高了我搞这份杂志的信心。这份杂志的很多内容我都是用 ChatGPT 帮忙写的。我只准备了一篇 [Announcing](https://rustmagazine.github.io/announcing/) 的文章就发布到社区了，没想到收到了非常大的反响，这让我欣慰至极也倍感压力。
+
+### Rust Search Extension
+
+[Rust Search Extension] 诞生于 2018 年 10 月，如今已经进入第 5 个年头了，我依然在维护这个产品。2022 年总共发布了 5 个版本，我也很高兴它收到了越来越多人的喜爱。值得一提的是，今年在 Reddit 上有两条评论让我感触很深。
+
+第一条是一位用户回复了一段很长的内容，大概意思就是我应该把这些好用的功能往 rustdoc，[docs.rs](https://docs.rs) 上提 PR，插件自身专注于搜索。这真的是一个非常好的问题，我之前也思考过，但是我没有这么做，最大的原因可能是因为我更追求"**自由**"。自己的产品，想做什么功能都是我一个人能决定的，如果往 rust 提 PR，事情就没那么容易了，没有那种“**自由**”。
+
+第二条的评论则是感动，被人认可真的是世界上最幸福的事情啊。
+
+> After having used this extension for a while now, I'm in awe of the genius idea to make it. At first, I thought to myself that this is largely unnecessary thing, and a rather silly thing. I was just shocked of how much I love it now. It is beyond invaluable to me, atleast compared to my initial impression.
+
+### duo
+
+[duo] 是一个集成 [tracing](https://github.com/tokio-rs/tracing) 和 [JeagerTracing](https://www.jaegertracing.io/) 的可观测性项目，把 demo 搞完之后，还很荣幸受 [Datenlord](https://datenlord.io) 的邀请参加了 2022 年的[开源之夏活动](https://summer-ospp.ac.cn/#/org/prodetail/221bd0394)，活动也顺利完成。不过今年实在没有太多额外的时间，所以后面基本上属于挖坑不填的状态了。2023 年要不要继续做我也不知道，时间永远都是有限的，如果我没有继续做，那说明我去做其他我认为更重要的事情去了。
+
+### 其他值得一提的事情
+
+- 年初参加了 RustTalk 播客的[第一期录制](https://rusttalk.github.io/podcast/001/)，也是我第一次受邀录制播客，在播客软件里面听到自己的声音感觉非常有意思。
+- 上半年很荣幸获得 Rust Foundation 的[赞助](https://foundation.rust-lang.org/news/2022-06-14-community-grants-program-awards-announcement/#individual-project-grant-awards)，主要赞助我下半年持续开发 [Rust Search Extension] 和 [zine]。
+- 圣诞节又受邀参加了国外的 [Rustacean Station](https://rustacean-station.org/) 播客的录制，主要是分享 Rust Magazine。第一次用英语和外国人聊了一个小时，节目还没有发出来，不知道效果怎么样。
+- 今年我的 [Twitter](https://twitter.com/_hisriver) 涨粉好多，感觉至少涨了两三千？[Github](https://github.com/folyd) 也涨了 200+?
+
+## 不变和改变
+
+### 不变
+
+- 依然坚持自己的兴趣爱好，乐理、钢琴、摇滚/后摇、纪录片等等；
+- 依然对世界充满好奇，维基百科永远是我的宝藏，我已经忘了什么时候开始的每个月都会小额捐赠一笔美金给维基百科基金会，除了书本，我其他很大部分知识全是通过它来获得的；
+- 依然理想主义和极简主义；
+- 依然保持一颗赤子之心；
+- 依然很宅；
+
+### 改变
+
+- 会弹键盘了，虽说键盘和钢琴看起来很像，但其实它们就是两个完全不同的乐器，键盘也有非常多的东西要学，我还只学了一点皮毛；
+- 喜欢上了看英超（又多了一项花时间的爱好）。英超不愧是世界第一联赛，不仅是球队和球星高水平，它的各种细节真的比西甲、法甲等其他联赛要好很多；
+- 认识了很多新的朋友，这一点真的很开心！
+- 更加关注时政，更加追求民主与法治；
+
+
+没了，就这么多吧，明年再会！
+
+
+[Rust Search Extension]: https://rust.extension.sh/
+[zine]: https://github.com/zineland/zine
+[duo]: https://github.com/duo-rs/duo
+
