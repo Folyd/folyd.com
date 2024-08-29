@@ -1,20 +1,21 @@
 name: Deploy
 
 on: 
+  workflow_dispatch:
   push:
     branches:
     - master
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: 'master'
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-    - name: Deploy
-      run: ./deploy.sh
+      - uses: actions/checkout@v4
+        with:
+          ref: 'master'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Deploy
+        run: ./deploy.sh
