@@ -235,11 +235,9 @@ body, html {
 }
 
 .page-footer {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 12px 20px;
-  z-index: 100;
+  padding: 40px 20px 20px;
+  text-align: center;
+  margin-top: 60px;
 
   .footer-content {
     small {
@@ -262,14 +260,5 @@ body, html {
         color: #C9D6F5;
       }
     }
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .page-footer {
-    position: relative;
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
   }
 }
