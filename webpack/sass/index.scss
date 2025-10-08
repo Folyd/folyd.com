@@ -233,3 +233,43 @@ body, html {
     display: none;
   }
 }
+
+.page-footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  padding: 12px 20px;
+  z-index: 100;
+
+  .footer-content {
+    small {
+      color: #6D7D93;
+      font-size: 13px;
+
+      a {
+        color: #6D7D93;
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #1c45a5;
+          text-decoration: underline;
+        }
+      }
+
+      .footer-separator {
+        margin: 0 8px;
+        color: #C9D6F5;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .page-footer {
+    position: relative;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+  }
+}
