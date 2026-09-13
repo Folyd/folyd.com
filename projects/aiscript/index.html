@@ -233,10 +233,10 @@
 
 <span class="nx">$</span><span class="w"> </span><span class="nx">cat</span><span class="w"> </span><span class="nx">web</span><span class="p">.</span><span class="nx">ai</span>
 <span class="nx">get</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="s2">&quot;&quot;&quot;A api to ask LLM&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="s2">"""A api to ask LLM"""</span>
 
 <span class="w">    </span><span class="nx">query</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="s2">&quot;&quot;&quot;the question to ask&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="s2">"""the question to ask"""</span>
 <span class="w">        </span><span class="err">@</span><span class="nx">string</span><span class="p">(</span><span class="nx">min_len</span><span class="o">=</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="nx">max_len</span><span class="o">=</span><span class="mf">100</span><span class="p">)</span><span class="w"> </span><span class="c1">// validate params with builtin directive @string</span>
 <span class="w">        </span><span class="nx">question</span><span class="o">:</span><span class="w"> </span><span class="nx">str</span>
 <span class="w">    </span><span class="p">}</span>
@@ -247,7 +247,7 @@
 <span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nx">answer</span><span class="p">;</span>
 <span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="c1">// use query.name or query[&quot;name&quot;] to access query parameter</span>
+<span class="w">    </span><span class="c1">// use query.name or query["name"] to access query parameter</span>
 <span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">answer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ask</span><span class="p">(</span><span class="nx">query</span><span class="p">.</span><span class="nx">question</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">answer</span><span class="w"> </span><span class="p">};</span>
 <span class="p">}</span>
@@ -257,17 +257,17 @@
 
 <span class="nx">$</span><span class="w"> </span><span class="nx">curl</span><span class="w"> </span><span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:8080</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="s2">&quot;error&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Missing required field: question&quot;</span>
+<span class="w">    </span><span class="s2">"error"</span><span class="o">:</span><span class="w"> </span><span class="s2">"Missing required field: question"</span>
 <span class="p">}</span>
 
 <span class="nx">$</span><span class="w"> </span><span class="nx">curl</span><span class="w"> </span><span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:8080?question=Hi</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="s2">&quot;error&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Field validation failed: question: String length is less than the minimum length of 3&quot;</span>
+<span class="w">    </span><span class="s2">"error"</span><span class="o">:</span><span class="w"> </span><span class="s2">"Field validation failed: question: String length is less than the minimum length of 3"</span>
 <span class="p">}</span>
 
 <span class="nx">$</span><span class="w"> </span><span class="nx">curl</span><span class="w"> </span><span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:8080?question=What is the capital of France?</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="s2">&quot;answer&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;The capital of France is Paris.&quot;</span>
+<span class="w">    </span><span class="s2">"answer"</span><span class="o">:</span><span class="w"> </span><span class="s2">"The capital of France is Paris."</span>
 <span class="p">}</span>
 </pre></div>
 <p>You can open <a href="http://localhost:8080/redoc">http://localhost:8080/redoc</a> to see the automatically generated API documentation.</p>

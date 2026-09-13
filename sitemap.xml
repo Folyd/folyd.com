@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://folyd.com/</loc></url>
+  <url><loc>https://folyd.com/about/</loc></url>
+  <url><loc>https://folyd.com/about/introduction/</loc></url>
+  <url><loc>https://folyd.com/about/domains/</loc></url>
   <url><loc>https://folyd.com/projects/</loc></url>
   <url><loc>https://folyd.com/projects/meiguo/</loc></url>
   <url><loc>https://folyd.com/projects/aiberm/</loc></url>
@@ -26,7 +29,4 @@
   <url><loc>https://folyd.com/blog/moonlit-sailor/</loc></url>
   <url><loc>https://folyd.com/blog/anyshortcut-cli-and-rust/</loc></url>
   <url><loc>https://folyd.com/blog/the-origin-of-folyd/</loc></url>
-  <url><loc>https://folyd.com/about/</loc></url>
-  <url><loc>https://folyd.com/about/introduction/</loc></url>
-  <url><loc>https://folyd.com/about/domains/</loc></url>
 </urlset>
